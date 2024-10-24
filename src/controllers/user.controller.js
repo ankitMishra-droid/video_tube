@@ -40,8 +40,6 @@ const createUser = asyncHandler(async (req, res) => {
           coverAvatar,
         } = req.body;
       
-        console.log(req.body)
-      
         if (!userName) {
           throw new ApiError(400, "Username is required");
         }
@@ -466,9 +464,12 @@ const passwordReset = asyncHandler( async(req, res) => {
       new ApiResponse(201, "password reset successfully", token)
     )
   } catch (error) {
-    return res.status(500).josn(
-      new ApiError(500, "somthing went wrong")
-    )
+    console.log(error)
+    return res.status(500).json({
+      meessage: error?.message || "something went wrong",
+      error: true,
+      success: false
+    })
   }
 })
 

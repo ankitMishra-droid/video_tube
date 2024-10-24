@@ -136,9 +136,9 @@ const getAllComments = asyncHandler(async (req, res) => {
 
     const { page = 1, limit = 10 } = req.query;
 
-    if (!isValidObjectId(videoId)) {
-      throw new Error("video id invalid");
-    }
+    // if (!isValidObjectId(videoId)) {
+    //   throw new Error("video id invalid");
+    // }
 
     const video = await Video.findById(videoId);
 
@@ -148,7 +148,9 @@ const getAllComments = asyncHandler(async (req, res) => {
 
     const commentAggregate = await Comments.aggregate([
       {
-        $match: { video: new mongoose.Types.ObjectId(videoId) },
+        $match: {
+          video: new mongoose.Types.ObjectId(videoId),
+        },
       },
       {
         $lookup: {
@@ -156,7 +158,7 @@ const getAllComments = asyncHandler(async (req, res) => {
           localField: "owner",
           foreignField: "_id",
           as: "owner",
-        },
+        }
       },
       {
         $lookup: {
@@ -164,7 +166,7 @@ const getAllComments = asyncHandler(async (req, res) => {
           localField: "_id",
           foreignField: "comment",
           as: "like",
-        },
+        }
       },
       {
         $addFields: {
@@ -180,15 +182,15 @@ const getAllComments = asyncHandler(async (req, res) => {
                 $in: [req.user?._id, "$like.likedBy"],
               },
               then: true,
-              else: false,
-            },
+              else: false
+            }
           },
         },
       },
       {
         $sort: {
           createdAt: -1,
-        },
+        }
       },
       {
         $project: {
@@ -201,8 +203,8 @@ const getAllComments = asyncHandler(async (req, res) => {
             "avatar.url": 1,
           },
           isLiked: 1,
-        },
-      },
+        }
+      }
     ]);
 
     const options = {
@@ -210,7 +212,10 @@ const getAllComments = asyncHandler(async (req, res) => {
       limit: parseInt(limit, 10),
     };
 
-    const comments = await Comments.aggregatePaginate(commentAggregate,options);
+    const comments = await Comments.aggregatePaginate(
+      commentAggregate,
+      options
+    );
 
     return res
       .status(200)
