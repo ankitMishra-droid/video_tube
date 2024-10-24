@@ -72,8 +72,6 @@ const getSubscribedChannels = asyncHandler( async(req, res) => {
             }
         ])
     
-        console.log(subscribe)
-    
         return res.status(200).json(
             new ApiResponse(201, "subscribed channels", subscribe)
         )
