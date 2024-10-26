@@ -1,7 +1,6 @@
 import { LucideListCollapse, Search } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
-import { ModeToggle } from "./mode-toggle";
 
 const Header = () => {
   return (
@@ -20,6 +19,7 @@ const Header = () => {
                 </div>
           </div>
           <div className="w-1/3">
+
           </div>
         </div>
       </nav>
