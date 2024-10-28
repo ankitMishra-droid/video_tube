@@ -1,29 +1,18 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Home from './pages/Home'
-import { ThemeProvider } from './components/theme-provider'
-import AppLayout from './components/layout/AppLayout'
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header";
+import Context from "./context";
 
 function App() {
-
-  const router = createBrowserRouter([
-    {
-      element: <AppLayout />,
-      children: [
-        {
-          path: "/",
-          element: <Home />
-        }
-      ]
-    }
-  ])
-
   return (
     <>
-    <ThemeProvider >
-      <RouterProvider router={router}/>
-    </ThemeProvider>
+      <Context.Provider>
+        <Header />
+        <main>
+          <Outlet />
+        </main>
+      </Context.Provider>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
