@@ -1,6 +1,6 @@
 const backendDomain = "http://localhost:7000"
 
-const apiURL = {
+const fetchApi = {
     signup: {
         url: `${backendDomain}/api/users/register`,
         method: "POST"
@@ -10,3 +10,5 @@ const apiURL = {
         method: "POST"
     }
 }
+
+export default fetchApi

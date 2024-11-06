@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { createUser, loginUser, logout, updateProfile, changePassword, getCurrentUser, refreshAccessToken, getUserChannelProfile, getWatchHistory, sendResetLink, passwordReset } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { upload } from "../middlewares/multer.js";
 
 const userRouter = Router();
 
-userRouter.route("/register").post(createUser)
+userRouter.route("/register").post(upload.fields([{name: "avatar", maxCount: 1}, {name: "coverAvatar", maxCount: 1}]) ,createUser)
 userRouter.route("/login").post(loginUser)
 userRouter.route("/logout").get(verifyJWT, logout)
 userRouter.route("/update-user").post(verifyJWT, updateProfile)

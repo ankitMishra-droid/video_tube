@@ -28,7 +28,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 };
 
 const createUser = asyncHandler(async (req, res) => {
-    try {
+    // try {
       const {
           userName,
           firstName,
@@ -36,8 +36,6 @@ const createUser = asyncHandler(async (req, res) => {
           email,
           password,
           role,
-          avatar,
-          coverAvatar,
         } = req.body;
       
         if (!userName) {
@@ -56,6 +54,11 @@ const createUser = asyncHandler(async (req, res) => {
           throw new ApiError(400, "Password is required");
         }
       
+        const avatarPath = req.files?.avatar ? `/${req.files.avatar[0].filename}` : "/user_profile/user.png"
+        const coverAvatarPath = req.files?.coverAvatar ? `/${req.files.coverAvatar[0].filename}` : "/user_profile/user.png"
+
+        // console.log(avatarPath)
+
         // Check for existing user
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
       
@@ -74,10 +77,10 @@ const createUser = asyncHandler(async (req, res) => {
           firstName,
           lastName,
           email,
-          password, // Password will be hashed in the schema
-          role: role || "USER", // Default to "USER" if not provided
-          avatar: avatar || "/user_profile/user.png", // Default avatar
-          coverAvatar: coverAvatar || "/user_profile/user.png", // Default coverAvatar
+          password,
+          role: role || "USER",
+          avatar: avatarPath,
+          coverAvatar: coverAvatarPath
         });
       
         const createdUser = await User.findOne({ _id: user._id }).select(
@@ -86,12 +89,13 @@ const createUser = asyncHandler(async (req, res) => {
       
         return res
           .status(201)
-          .json(new ApiResponse(200, createdUser, "User registered successfully"));
-    } catch (error) {
-      return res.status(500).json(
-        new ApiError(500, {message: error.message || "somthing went wrong"})
-      )
-    }
+          .json(new ApiResponse(200, "User registered successfully", createdUser));
+    // } catch (error) {
+    //   console.log(error)
+    //   return res.status(500).json(
+    //     new ApiError(500, {message: error.message || "somthing went wrong"})
+    //   )
+    // }
 });
 
 const loginUser = asyncHandler( async(req, res) => {

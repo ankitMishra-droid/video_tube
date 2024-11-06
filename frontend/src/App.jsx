@@ -1,16 +1,51 @@
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
-import Context from "./context";
+import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { healthCheck } from "./fetchDetails/healthCheck";
+import { getCurrentUser } from "./fetchDetails/getCurrentUser";
 
 function App() {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    healthCheck().then(() => {
+      getCurrentUser(dispatch).then(() => {
+        setLoading(false);
+      });
+    });
+    setInterval(() => {
+      healthCheck();
+    }, 5 * 60 * 1000);
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <div className="h-screen w-full  overflow-y-auto bg-[#121212] text-white">
+          <div className="flex flex-col items-center justify-center mt-64">
+            <span>loading...</span>
+            <h1 className="text-3xl text-center mt-8 font-semibold">
+              Please wait...
+            </h1>
+            <h1 className="text-xl text-center mt-4">
+              Refresh the page if it takes too long
+            </h1>
+          </div>
+        </div>
+      </>
+    );
+  }
   return (
     <>
-      <Context.Provider>
+      <main className="min-h-full w-full">
+        <ToastContainer position="top-center" />
         <Header />
-        <main>
-          <Outlet />
-        </main>
-      </Context.Provider>
+        <Outlet />
+      </main>
     </>
   );
 }

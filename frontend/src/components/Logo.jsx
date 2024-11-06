@@ -1,10 +1,10 @@
-import React from 'react'
-import logo from "../assets/icons/logo1.png"
+import React from 'react';
+import logo from "../assets/logo.png";
 
-const Logo = ({className, w, h}) => {
+const Logo = ({className, width, height}) => {
   return (
-    <div>
-      <img src={logo} width={w} height={h} className={className}/>
+    <div className='w-full'>
+      <img src={logo} alt='logo' width={width} height={height} className={`${className}`}/>
     </div>
   )
 }

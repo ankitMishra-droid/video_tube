@@ -1,15 +1,47 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import { Provider } from 'react-redux'
-import { store } from './store/store'
-import { RouterProvider } from 'react-router-dom'
-import router from './routes'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import Home from "./pages/Home";
+import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
+import { ThemeProvider } from "./components/theme-provider";
+import PageNotFound from "./components/PageNotFound";
 
-createRoot(document.getElementById('root')).render(
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "signup",
+        element: <SignUp />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <PageNotFound />,
+  }
+]);
+
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router}/>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </Provider>
-  </StrictMode>,
-)
+  </StrictMode>
+);
