@@ -1,6 +1,6 @@
 import fetchApi from "@/common";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const SignUp = () => {
@@ -13,6 +13,8 @@ const SignUp = () => {
     avatar: "",
   });
 
+  const navigate = useNavigate()
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -23,6 +25,16 @@ const SignUp = () => {
       };
     });
   };
+
+  const handleUploadFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setData((preData) => ({
+        ...preData,
+        avatar: file,
+      }));
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,10 +55,9 @@ const SignUp = () => {
 
     const dataRes = await response.json();
 
-    console.log(dataRes);
-
-    if (response.ok) {
+    if (dataRes.success) {
       toast.success(dataRes.message);
+      navigate("/login")
     } else {
       toast.error(dataRes.message || "something went wrong");
     }
@@ -145,8 +156,7 @@ const SignUp = () => {
                 id="avatar"
                 name="avatar"
                 type="file"
-                value={data.avatar}
-                onChange={handleChange}
+                onChange={handleUploadFile}
                 placeholder="******************"
                 required
               />
@@ -182,7 +192,7 @@ const SignUp = () => {
                 </Link>
               </p>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center">
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 Sign Up
               </button>

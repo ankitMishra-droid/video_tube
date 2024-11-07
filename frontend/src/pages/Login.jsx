@@ -1,44 +1,72 @@
 import fetchApi from "@/common";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loader from "../assets/loader.gif";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "@/features/authSlice";
+import { Eye, EyeClosed } from "lucide-react";
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({ email: "", password: "", general: "" });
+  const [showPassword, setShowPassword] = useState(false)
+
   const [data, setData] = useState({
     email: "",
     password: "",
   });
 
+  const togglePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prevData) => {
-      return {
-        ...prevData,
-        [name]: value,
-      };
-    });
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    setError({ ...error, [name]: "", general: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError({ email: "", password: "", general: "" });
 
-    const response = await fetch(fetchApi.login.url, {
-      method: fetchApi.login.method,
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch(fetchApi.login.url, {
+        method: fetchApi.login.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    const dataRes = await response.json();
-    console.log("Parsed Response Data:", dataRes);
+      // console.log(response.status)
+      const dataRes = await response.json();
 
-    if (response.ok) {
-      toast.success(dataRes.message);
-    } else {
-      console.error("Error Response Data:", dataRes);
-      toast.error(dataRes.message || "somthing went wrong");
+      if (response.ok && dataRes.data) {
+        dispatch(setUserDetails(dataRes.data.user));
+        localStorage.setItem("accessToken", dataRes.data.accessToken);
+        
+        toast.success(dataRes.message);
+        navigate("/");
+
+      } else if (response.status === 403) {
+        setError((prev) => ({ ...prev, email: "User does not exist." }));
+      } else if (response.status === 405) {
+        setError((prev) => ({ ...prev, password: "Invalid password." }));
+      }
+    } catch (err) {
+      setError((prev) => ({ ...prev, general: "something went wrong" }));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,8 +94,11 @@ const Login = () => {
               onChange={handleChange}
               required
             />
+            {error.email && (
+              <p className="text-red-500 text-xs italic">{error.email}</p>
+            )}
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="password"
@@ -78,23 +109,54 @@ const Login = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="******************"
               value={data.password}
               onChange={handleChange}
-              placeholder="******************"
               required
             />
-            {/* <p className="text-red-500 text-xs italic">Please choose a password.</p> */}
-          </div>
-          <div className="mb-6">
-            <p className="text-center text-blue-500 text-xs">
-              Don't Have an Account? <Link to={"/signup"} className="text-red-500 hover:underline pl-1">SignUp</Link>
-            </p>
-          </div>
-          <div className="flex items-center justify-between">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-              Sign In
+            <button onClick={togglePassword} className="absolute top-9 right-2">
+              {
+                showPassword ? (
+                  <>
+                  <EyeClosed />
+                  </>
+                ): (
+                  <>
+                  <Eye />
+                  </>
+                )
+              }
             </button>
+            {error.password && (
+              <p className="text-red-500 text-xs italic">{error.password}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-center justify-center">
+            <button
+              className="bg-blue-600 hover:bg-blue-700 w-1/2 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-between">
+                  <p>Signing in...</p>
+                  <img src={Loader} alt="loading" className="w-6 h-6 ml-2" />
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+            {error.general && (
+              <p className="text-red-500 text-xs italic mt-2">{error.general}</p>
+            )}
+
+            <p className="text-center text-blue-500 text-xs py-1 pt-2">
+              Don't Have an Account?{" "}
+              <Link to="/signup" className="text-red-500 hover:underline pl-1">
+                Sign Up
+              </Link>
+            </p>
+
             <Link
               className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
               to="#"

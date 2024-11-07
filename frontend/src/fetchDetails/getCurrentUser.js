@@ -6,7 +6,6 @@ export const getCurrentUser = async(dispatch) => {
 
         const dataRes = await response.json()
 
-        console.log(dataRes?.data?.data)
         if(dataRes?.data?.data){
             dispatch(setUserDetails(dataRes?.data?.data))
             return dataRes.data

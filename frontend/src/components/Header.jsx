@@ -1,17 +1,15 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { useTheme } from "./theme-provider";
-import { LucideSunDim, MoonIcon } from "lucide-react";
+import { LucideSunDim, MoonIcon, User2 } from "lucide-react";
 import Logo from "./Logo";
 import { Link } from "react-router-dom";
 import Search from "./Search";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 const Header = () => {
-  const authStatus = useSelector((state) => state.auth.status);
-  const userData = useSelector((state) => state.user.user);
-
-  const dispatch = useDispatch();
+  const authStatus = useSelector((state) => state?.auth?.status);
+  const { user } = useSelector((state) => state?.auth);
 
   const { theme, setTheme } = useTheme();
 
@@ -34,17 +32,24 @@ const Header = () => {
           </>
         )}
 
-        {authStatus && userData && (
-          <>
-            <Link to={`/channel/${userData.userName}`}>
-              <img
-                src={userData.avatar}
-                alt={userData.userName}
+        {authStatus && user && (
+          <div>
+            <Link to={`/channel/${user.userName}`} className="flex">
+              {/* <img
+                src={user.avatar}
+                alt={user.firstName}
                 className="object-cover h-14 w-14 shrink-0 rounded-full"
-              />
+              /> */}
+              <p className="text-white">
+                <User2 />
+              </p>
+              <p className="text-white">{user.firstName}</p>
             </Link>
-          </>
+          </div>
         )}
+        {/* <button onClick={toggleMode}>
+          {theme === "dark" ? <LucideSunDim /> : <MoonIcon />}
+        </button> */}
       </div>
     </nav>
   );

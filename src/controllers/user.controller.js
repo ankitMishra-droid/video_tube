@@ -57,18 +57,22 @@ const createUser = asyncHandler(async (req, res) => {
         const avatarPath = req.files?.avatar ? `/${req.files.avatar[0].filename}` : "/user_profile/user.png"
         const coverAvatarPath = req.files?.coverAvatar ? `/${req.files.coverAvatar[0].filename}` : "/user_profile/user.png"
 
+        if(!avatarPath){
+          throw new ApiError(401, "profile image is required")
+        }
+
         // console.log(avatarPath)
 
         // Check for existing user
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
       
         if (existingUser) {
-          if (existingUser.email === email) {
+          // if (existingUser.email === email) {
             throw new ApiError(400, "Email is already registered.");
-          }
-          if (existingUser.userName === userName) {
-            throw new ApiError(400, "Username is already registered.");
-          }
+          // }
+          // if (existingUser.userName === userName) {
+          //   throw new ApiError(400, "Username is already registered.");
+          // }
         }
       
         // Create new user
@@ -99,7 +103,7 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler( async(req, res) => {
-  try {
+  
     const {email, password} = req.body;
 
     if(!email){
@@ -113,13 +117,13 @@ const loginUser = asyncHandler( async(req, res) => {
     const user = await User.findOne({email});
 
     if(!user){
-      throw new ApiError(401, "user does not exist.")
+      throw new ApiError(403, "user does not exist.")
     }
 
     const checkPassword = await user.isPasswordCorrect(password);
 
     if(!checkPassword){
-      throw new ApiError(401, "wrong password please try again.")
+      throw new ApiError(405, "wrong password please try again.")
     }
 
     const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
@@ -138,12 +142,6 @@ const loginUser = asyncHandler( async(req, res) => {
     .json(
       new ApiResponse(201, "user logged in.", {user: loggedInUser, accessToken, refreshToken})
     )
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json(
-      new ApiError(500, {message: error.message || "somthing went wrong"})
-    )
-  }
 })
 
 const logout = asyncHandler( async(req, res) => {
