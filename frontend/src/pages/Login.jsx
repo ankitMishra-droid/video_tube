@@ -1,4 +1,3 @@
-import fetchApi from "@/common";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,11 +5,13 @@ import Loader from "../assets/loader.gif";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "@/features/authSlice";
 import { Eye, EyeClosed } from "lucide-react";
+import fetchApi from "@/common"; // import fetchApi
+import axiosFetch from "@/helpers/fetchData";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({ email: "", password: "", general: "" });
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const [data, setData] = useState({
     email: "",
@@ -18,8 +19,8 @@ const Login = () => {
   });
 
   const togglePassword = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -33,38 +34,31 @@ const Login = () => {
     setError({ ...error, [name]: "", general: "" });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (data1) => {
+    // e.preventDefault();
     setLoading(true);
     setError({ email: "", password: "", general: "" });
 
     try {
-      const response = await fetch(fetchApi.login.url, {
-        method: fetchApi.login.method,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosFetch("/api/users/login", data1);
 
-      // console.log(response.status)
-      const dataRes = await response.json();
-
-      if (response.ok && dataRes.data) {
-        dispatch(setUserDetails(dataRes.data.user));
-        localStorage.setItem("accessToken", dataRes.data.accessToken);
-        
-        toast.success(dataRes.message);
+      if (response?.data?.data) {
+        dispatch(setUser(response.data.data.user));
+        localStorage.setItem(
+            "accessToken",
+            response.data.data.accessToken
+        );
+        toast.success(response.data.message + "🤩");
         navigate("/");
-
-      } else if (response.status === 403) {
-        setError((prev) => ({ ...prev, email: "User does not exist." }));
-      } else if (response.status === 405) {
-        setError((prev) => ({ ...prev, password: "Invalid password." }));
+    }
+    } catch (error) {
+      if (error.status === 403) {
+        setError((prev) => ({ ...prev, email: "User does not exist" }));
+      } else if (error.status === 405) {
+        setError((prev) => ({ ...prev, password: "Invalid password" }));
+      } else {
+        setError((prev) => ({ ...prev, general: "Something went wrong" }));
       }
-    } catch (err) {
-      setError((prev) => ({ ...prev, general: "something went wrong" }));
     } finally {
       setLoading(false);
     }
@@ -115,19 +109,9 @@ const Login = () => {
               onChange={handleChange}
               required
             />
-            <button onClick={togglePassword} className="absolute top-9 right-2">
-              {
-                showPassword ? (
-                  <>
-                  <EyeClosed />
-                  </>
-                ): (
-                  <>
-                  <Eye />
-                  </>
-                )
-              }
-            </button>
+            <p onClick={togglePassword} className="absolute top-9 right-2 cursor-pointer">
+              {showPassword ? <EyeClosed /> : <Eye />}
+            </p>
             {error.password && (
               <p className="text-red-500 text-xs italic">{error.password}</p>
             )}

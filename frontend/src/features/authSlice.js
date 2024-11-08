@@ -12,6 +12,7 @@ const authSlice = createSlice({
         setUserDetails: (state, action) => {
             state.status = true;
             state.user = action.payload;
+            // console.log(action.payload)
         },
         removeUserDetails: (state, action) => {
             state.status = false;
