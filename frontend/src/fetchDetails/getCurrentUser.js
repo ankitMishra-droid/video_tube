@@ -10,10 +10,8 @@ export const getCurrentUser = async(dispatch) => {
             }
         })
         
-        console.log("get current user",response)
         const dataRes = await response.json()
-        console.log("get current user",dataRes)
-        console.log(accessToken)
+        
         if(dataRes?.data?.data){
             dispatch(setUserDetails(dataRes?.data?.data))
             return dataRes.data

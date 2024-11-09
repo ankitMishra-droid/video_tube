@@ -5,8 +5,8 @@ import Loader from "../assets/loader.gif";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "@/features/authSlice";
 import { Eye, EyeClosed } from "lucide-react";
-import fetchApi from "@/common"; // import fetchApi
 import axiosFetch from "@/helpers/fetchData";
+import fetchApi from "@/common";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -34,31 +34,37 @@ const Login = () => {
     setError({ ...error, [name]: "", general: "" });
   };
 
-  const handleSubmit = async (data1) => {
-    // e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     setError({ email: "", password: "", general: "" });
 
     try {
-      const response = await axiosFetch("/api/users/login", data1);
+      const response = await fetch(fetchApi.login.url, {
+        method: fetchApi.login.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-      if (response?.data?.data) {
-        dispatch(setUser(response.data.data.user));
-        localStorage.setItem(
-            "accessToken",
-            response.data.data.accessToken
-        );
-        toast.success(response.data.message + "🤩");
+      const dataRes = await response.json();
+
+      console.log(dataRes.data);
+      if (response.ok && dataRes.success) {
+        dispatch(setUserDetails(dataRes.data.user));
+        localStorage.setItem("accessToken", dataRes.data.accessToken);
+
+        toast.success(dataRes.message + "🤩");
         navigate("/");
-    }
-    } catch (error) {
-      if (error.status === 403) {
+      } else if (error.status === 403) {
         setError((prev) => ({ ...prev, email: "User does not exist" }));
       } else if (error.status === 405) {
         setError((prev) => ({ ...prev, password: "Invalid password" }));
-      } else {
-        setError((prev) => ({ ...prev, general: "Something went wrong" }));
       }
+    } catch (error) {
+      setError((prev) => ({ ...prev, general: "Something went wrong" }));
     } finally {
       setLoading(false);
     }
@@ -109,7 +115,10 @@ const Login = () => {
               onChange={handleChange}
               required
             />
-            <p onClick={togglePassword} className="absolute top-9 right-2 cursor-pointer">
+            <p
+              onClick={togglePassword}
+              className="absolute top-9 right-2 cursor-pointer"
+            >
               {showPassword ? <EyeClosed /> : <Eye />}
             </p>
             {error.password && (
@@ -131,7 +140,9 @@ const Login = () => {
               )}
             </button>
             {error.general && (
-              <p className="text-red-500 text-xs italic mt-2">{error.general}</p>
+              <p className="text-red-500 text-xs italic mt-2">
+                {error.general}
+              </p>
             )}
 
             <p className="text-center text-blue-500 text-xs py-1 pt-2">
