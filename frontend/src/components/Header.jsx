@@ -1,46 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "./ui/button";
 import { useTheme } from "./theme-provider";
 import { LucideSunDim, MoonIcon, User2 } from "lucide-react";
 import Logo from "./Logo";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Search from "./Search";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import fetchApi from "@/common";
-import { removeUserDetails } from "@/features/authSlice";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const authStatus = useSelector((state) => state?.auth?.status);
   const user = useSelector((state) => state?.auth?.user);
-  const dispatch = useDispatch()
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate()
 
   const toggleMode = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
-
-  const handleLogout = async() => {
-    try {
-      const response = await fetch(fetchApi.logoutUser.url, {
-        method: fetchApi.logoutUser.method,
-        credentials: "include"
-      });
-
-      const dataRes = await response.json();
-      if(dataRes.success){
-        localStorage.removeItem("accessToken");
-        sessionStorage.removeItem("accessToken");
-        toast.success("Logged out!")
-        dispatch(removeUserDetails(null))
-        navigate("/")
-    }
-    } catch (error) {
-      toast.error(error.message)
-      console.log(error)
-    }
-  }
 
   return (
     <nav className="w-full bg-gray-700 py-6">
@@ -70,7 +44,6 @@ const Header = () => {
               </p>
               <p className="text-white">{user.firstName}</p>
             </Link>
-            <button onClick={handleLogout} className="rounded-sm bg-white/90 px-3 py-1">Logout</button>
           </div>
         )}
         {/* <button onClick={toggleMode}>

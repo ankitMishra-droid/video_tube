@@ -1,6 +1,7 @@
 import {
   History,
   Home,
+  LogOut,
   LucideSubscript,
   MessageCircle,
   Play,
@@ -13,15 +14,49 @@ import {
   X,
 } from "lucide-react";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
+import { useDispatch, useSelector } from "react-redux";
+import fetchApi from "@/common";
+import { toast } from "react-toastify";
+import { removeUserDetails } from "@/features/authSlice";
 
 const SideBarNav = () => {
   const [show, setShow] = useState(true);
 
+  const authStatus = useSelector((state) => state?.auth?.status);
+  const userData = useSelector((state) => state?.auth?.user);
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  console.log(authStatus);
+
   const toggleShow = () => {
     setShow(!show);
   };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(fetchApi.logoutUser.url, {
+        method: fetchApi.logoutUser.method,
+        credentials: "include",
+      });
+
+      const dataRes = await response.json();
+      if (dataRes.success) {
+        localStorage.removeItem("accessToken");
+        sessionStorage.removeItem("accessToken");
+        toast.success("Logged out!");
+        dispatch(removeUserDetails(null));
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div className="absolute top-[29px] left-1">
@@ -123,16 +158,32 @@ const SideBarNav = () => {
               </li>
             </ul>
           </div>
-          <div className="absolute bottom-0 py-4">
-            <ul className="space-y-2 font-medium w-full">
-              <li>
-                <Link to={"/settings"} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                  <Settings />
-                  <span className="flex-1 ms-3 whitespace-nowrap">Setting</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {authStatus && (
+            <div className="absolute bottom-0 py-4">
+              <ul className="space-y-2 font-medium w-full">
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  >
+                    <LogOut />
+                    <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>
+                  </button>
+                </li>
+                <li>
+                  <Link
+                    to={"/settings"}
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  >
+                    <Settings />
+                    <span className="flex-1 ms-3 whitespace-nowrap">
+                      Setting
+                    </span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </>
