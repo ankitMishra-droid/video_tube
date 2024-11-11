@@ -10,6 +10,7 @@ import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import { ThemeProvider } from "./components/theme-provider";
 import PageNotFound from "./components/PageNotFound";
+import MyChannel from "./components/channels/MyChannel";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,15 @@ const router = createBrowserRouter([
         path: "login",
         element: <Login />,
       },
+      {
+        path: "/channel/:userName",
+        element: <MyChannel />,
+        children: [
+          {
+            
+          }
+        ]
+      }
     ],
   },
   {

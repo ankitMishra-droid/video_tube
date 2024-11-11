@@ -10,8 +10,8 @@ const PageNotFound = () => {
         <img src={notFound} className='sm::w-96 sm:h-96 w-auto p-2 rounded-xl' alt='404 not found'/>
       </div>
       <div className='mt-5'>
-        <Button>
-            <Link to={"/"}>Back To Home</Link>
+        <Button onClick={() => {window.location.replace("/")}}>
+            Back To Home
         </Button>
       </div>
     </div>

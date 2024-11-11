@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import { Outlet } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { healthCheck } from "./fetchDetails/healthCheck";
 import { getCurrentUser } from "./fetchDetails/getCurrentUser";
+import SideBarNav from "./components/SideBarNav";
 
 function App() {
   const dispatch = useDispatch();
@@ -41,9 +42,18 @@ function App() {
   }
   return (
     <>
-      <main className="min-h-full w-full">
-        <ToastContainer position="top-center" />
-        <Header />
+      <main className="h-screen w-full">
+        <ToastContainer
+          position="top-right"
+          theme="dark"
+          draggable
+          autoClose={2000}
+          hideProgressBar
+        />
+        <div className="relative">
+          <SideBarNav />
+          <Header />
+        </div>
         <Outlet />
       </main>
     </>
