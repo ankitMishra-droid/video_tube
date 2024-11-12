@@ -3,7 +3,7 @@ import { addUser } from "@/features/userSlice";
 
 export const getUseProfile = async(dispatch, userName) => {
     try {
-        const response = await fetch(`${fetchApi.userProfile}/${userName}`, {
+        const response = await fetch(`${fetchApi.userProfile.url}/${userName}`, {
             method: fetchApi.userProfile.method,
             credentials: "include"
         })

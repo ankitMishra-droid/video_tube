@@ -21,7 +21,7 @@ import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import { removeUserDetails } from "@/features/authSlice";
 
-const SideBarNav = () => {
+const SideBarNav = ({setIsSidebarIsOpen}) => {
   const [show, setShow] = useState(true);
 
   const authStatus = useSelector((state) => state?.auth?.status);
@@ -30,10 +30,9 @@ const SideBarNav = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log(authStatus);
-
   const toggleShow = () => {
     setShow(!show);
+    setIsSidebarIsOpen(!show)
   };
 
   const handleLogout = async () => {
@@ -73,7 +72,7 @@ const SideBarNav = () => {
         </div>
         <div
           id="drawer-navigation"
-          className={`fixed top-0 left-0 z-40 w-64 h-screen p-4 overflow-y-auto bg-white dark:bg-gray-800 transition-transform ${
+          className={`fixed top-0 w-full left-0 z-40 sm:w-64 h-screen p-4 overflow-y-auto bg-white dark:bg-gray-800 transition-transform ${
             show ? "translate-x-0" : "-translate-x-full"
           }`}
           aria-hidden={!show}

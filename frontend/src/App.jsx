@@ -11,6 +11,7 @@ import SideBarNav from "./components/SideBarNav";
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     healthCheck().then(() => {
@@ -50,11 +51,13 @@ function App() {
           autoClose={2000}
           hideProgressBar
         />
-        <div className="relative">
-          <SideBarNav />
-          <Header />
+        <div className="">
+          <SideBarNav setIsSidebarIsOpen={setIsSidebarOpen}/>
         </div>
-        <Outlet />
+          <Header />
+        <main className={`flex-1 transition-all delay-0 md:${isSidebarOpen ? "ml-64" : "ml-0" } overflow-y-hidden`}>
+          <Outlet />
+        </main>
       </main>
     </>
   );

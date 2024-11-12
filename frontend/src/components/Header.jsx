@@ -18,11 +18,13 @@ const Header = () => {
 
   return (
     <nav className="w-full bg-gray-700 py-6">
-      <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2">
-        <Link to={"/"} className="inline-block">
+      <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2 px-2">
+        <Link to={"/"} className="hidden md:inline-block md:pl-7 pl-0 pr-3 md:pr-0">
           <Logo className={""} width={110} height={110} />
         </Link>
-        <Search />
+        <div className="pl-9 md:pl-0">
+          <Search />
+        </div>
         {!authStatus && (
           <>
             <Button>

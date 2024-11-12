@@ -14,11 +14,19 @@ const fetchApi = {
         method: "GET"
     },
     userProfile: {
-        url: `${backendDomain}/api/users`,
+        url: `${backendDomain}/api/users/channel-name`,
         method: "GET"
     },
     logoutUser: {
         url: `${backendDomain}/api/users/logout`,
+        method: "GET"
+    },
+    userSubscribe: {
+        url: `${backendDomain}/api/subscribe/c`,
+        method: "POST"
+    },
+    getAboutChannel: {
+        url: `${backendDomain}/api/dashboard`,
         method: "GET"
     }
 }

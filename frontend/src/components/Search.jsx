@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 const Search = () => {
   return (
-    <form className="max-w-lg flex items-center w-full">
+    <form className="lg:max-w-lg md:max-w-md max-w-xs flex items-center w-full">
       <div className="relative flex-grow">
         <input
           type="text"

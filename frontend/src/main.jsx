@@ -11,6 +11,10 @@ import Login from "./pages/Login";
 import { ThemeProvider } from "./components/theme-provider";
 import PageNotFound from "./components/PageNotFound";
 import MyChannel from "./components/channels/MyChannel";
+import ChannelVideos from "./components/channels/ChannelVideos";
+import Tweets from "./components/channels/Tweets";
+import VideoPlaylist from "./components/channels/VideoPlaylist";
+import About from "./components/channels/About";
 
 const router = createBrowserRouter([
   {
@@ -34,8 +38,21 @@ const router = createBrowserRouter([
         element: <MyChannel />,
         children: [
           {
-            
-          }
+            path: "/channel/:userName",
+            element: <ChannelVideos />
+          },
+          {
+            path: "/channel/:userName/tweets",
+            element: <Tweets />
+          },
+          {
+            path: "/channel/:userName/playlist",
+            element: <VideoPlaylist />
+          },
+          {
+            path: "/channel/:userName/about",
+            element: <About />
+          },
         ]
       }
     ],
