@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { setUserDetails } from "@/features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { getUseProfile } from "@/fetchDetails/getUserProfile";
 import GuestComponent from "../guest/GuestComponent";
 import { toast } from "react-toastify";
@@ -120,7 +120,7 @@ const MyChannel = () => {
           </div>
         </div>
       </div>
-      <ul className="scroll border-b-2 sticky z-[2] flex flex-row gap-x-5 overflow-auto py-2">
+      <ul className="scroll border-b-2 sticky z-[2] flex flex-row gap-x-4 overflow-auto py-2">
         <li className="w-full">
           <NavLink
             to={""}
@@ -171,6 +171,7 @@ const MyChannel = () => {
           </NavLink>
         </li>
       </ul>
+      <Outlet />
     </div>
   );
 };

@@ -61,7 +61,7 @@ const publishVideo = asyncHandler(async (req, res) => {
 
 const getAllVideos = asyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+    const { page = 1, limit = 10, query, sortBy = "createdAt", sortType = "desc", userId } = req.query;
 
     const sortByField = ["createdAt", "duration", "views"];
     const sortTypeArr = ["asc", "dsc"];
@@ -421,4 +421,80 @@ const togglePublish = asyncHandler( async(req, res) => {
     }
 })
 
-export { publishVideo, getAllVideos, getVideoById, deleteVideos, updateVideo, togglePublish };
+const getUserVideo = asyncHandler( async(req, res) => {
+  const {page = 1, limit = 10, sortType = "desc"} = req.query;
+  const {userId} = req.params;
+
+  if(!mongoose.isValidObjectId(userId)){
+    throw new ApiError(400, "invalid user id")
+  }
+
+  const video = await Video.aggregate([
+    {
+      $match: {
+        owner: new mongoose.Types.ObjectId(userId), isPublished: true
+      }
+    },
+    {
+      $sort: {
+        createdAt: sortType === "asc" ? 1 : -1
+      }
+    },
+    {
+      $skip: (page - 1) * limit
+    },
+    {
+      $limit: parseInt(limit)
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+            $project: {
+              avatar: 1,
+              userName: 1,
+              firstName: 1,
+              lastName: 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields: {
+        owner: {
+          $first: "$owner"
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        owner: 1,
+        videoFile: 1,
+        thumbnail: 1,
+        createdAt: 1,
+        title: 1,
+        description: 1,
+        duration: 1,
+        views: 1,
+        isPublished:1 
+      }
+    }
+  ])
+
+  console.log(video)
+
+  if(!video){
+    throw new ApiError(401, "Error while fetching video")
+  }
+
+  return res.status(200).json(
+    new ApiResponse(201, "fetched user videos", video)
+  )
+})
+export { publishVideo, getAllVideos, getVideoById, deleteVideos, updateVideo, togglePublish, getUserVideo };

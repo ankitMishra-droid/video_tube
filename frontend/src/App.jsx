@@ -55,7 +55,7 @@ function App() {
           <SideBarNav setIsSidebarIsOpen={setIsSidebarOpen}/>
         </div>
           <Header />
-        <main className={`flex-1 transition-all delay-0 md:${isSidebarOpen ? "ml-64" : "ml-0" } overflow-y-hidden`}>
+        <main className={`flex-1 transition-all delay-0 ${isSidebarOpen ? "ml-64" : "ml-0" } overflow-y-hidden`}>
           <Outlet />
         </main>
       </main>

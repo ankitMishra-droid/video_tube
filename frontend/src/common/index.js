@@ -28,6 +28,10 @@ const fetchApi = {
     getAboutChannel: {
         url: `${backendDomain}/api/dashboard`,
         method: "GET"
+    },
+    getUserVideo: {
+        url: `${backendDomain}/api/video/c`,
+        method: "GET"
     }
 }
 
