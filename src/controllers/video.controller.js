@@ -7,15 +7,17 @@ import crypto from "crypto";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
+import path from "path";
+import { getVideoDurationInSeconds } from "get-video-duration";
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
     const { title, description } = req.body;
 
-    const videoFile = req.files?.videoFile?.[0];
+    const videoFile = req.files?.videoFile[0]?.path;
 
     // console.log(req)
-    const thumbnailFile = req.files?.thumbnail?.[0];
+    const thumbnailFile = req.files?.thumbnail[0]?.path;
 
     if (!videoFile) {
       throw new ApiError(401, "Video file is required");
@@ -25,8 +27,14 @@ const publishVideo = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Thumbnail is required");
     }
 
-    const videoSrc = `/users_video/${req.user._id}/${videoFile.filename}`;
-    const thumbnailSrc = `/users_video/${req.user._id}/${thumbnailFile.filename}`;
+    const videoSrc = `/users_video/${req.user._id}/${path.basename(videoFile)}`;
+    const thumbnailSrc = `/users_video/${req.user._id}/${path.basename(
+      thumbnailFile
+    )}`;
+
+    // const duration = await getVideoDurationInSeconds(String(videoFile)).then((duration) => {
+    //   console.log(duration)
+    // })
 
     const video = await Video.create({
       title,
@@ -39,8 +47,8 @@ const publishVideo = asyncHandler(async (req, res) => {
         url: thumbnailSrc,
         public_id: crypto.randomBytes(32).toString("hex"),
       },
-      duration: req.body.duration || "Unknown",
-      isPublished: false,
+      duration: await getVideoDurationInSeconds(String(videoFile)),
+      isPublished: req.body.isPublished || false,
       owner: req.user?._id,
     });
 
@@ -61,7 +69,14 @@ const publishVideo = asyncHandler(async (req, res) => {
 
 const getAllVideos = asyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 10, query, sortBy = "createdAt", sortType = "desc", userId } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      query,
+      sortBy = "createdAt",
+      sortType = "desc",
+      userId,
+    } = req.query;
 
     const sortByField = ["createdAt", "duration", "views"];
     const sortTypeArr = ["asc", "dsc"];
@@ -327,7 +342,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     const { title, description } = req.body;
 
-    console.log(title, description)
+    console.log(title, description);
 
     if (!(title && description)) {
       throw new Error("all fields are required");
@@ -382,69 +397,63 @@ const updateVideo = asyncHandler(async (req, res) => {
   }
 });
 
-const togglePublish = asyncHandler( async(req, res) => {
-    try {
-        const { videoId } = req.params;
+const togglePublish = asyncHandler(async (req, res) => {
+  try {
+    const { videoId } = req.params;
 
-        if(!videoId){
-            throw new Error("invalid videoID")
-        }
-
-        const video = await Video.findById(videoId)
-
-        if(!video){
-            throw new Error("video not found")
-        }
-
-        if(video.owner.toString() != req.user?._id.toString()){
-            throw new Error("only owner can publish this video")
-        }
-
-        const toggleVideo = await Video.findByIdAndUpdate(videoId, {
-            isPublished: !video.isPublished
-        }, {new: true})
-
-        if(!toggleVideo){
-            throw new Error("published failed")
-        }
-
-        return res.status(200).json(
-            new ApiResponse(202, "video published", toggleVideo)
-        )
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: error?.message || "somthing went wrong",
-            error: true,
-            success: false
-        })
+    if (!videoId) {
+      throw new Error("invalid videoID");
     }
-})
 
-const getUserVideo = asyncHandler( async(req, res) => {
-  const {page = 1, limit = 10, sortType = "desc"} = req.query;
-  const {userId} = req.params;
+    const video = await Video.findById(videoId);
 
-  if(!mongoose.isValidObjectId(userId)){
-    throw new ApiError(400, "invalid user id")
+    if (!video) {
+      throw new Error("video not found");
+    }
+
+    if (video.owner.toString() != req.user?._id.toString()) {
+      throw new Error("only owner can publish this video");
+    }
+
+    const toggleVideo = await Video.findByIdAndUpdate(
+      videoId,
+      {
+        isPublished: !video.isPublished,
+      },
+      { new: true }
+    );
+
+    if (!toggleVideo) {
+      throw new Error("published failed");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(202, "video published", toggleVideo));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: error?.message || "somthing went wrong",
+      error: true,
+      success: false,
+    });
+  }
+});
+
+const getUserVideo = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, sortType = "desc" } = req.query;
+  const { userId } = req.params;
+
+  if (!mongoose.isValidObjectId(userId)) {
+    throw new ApiError(400, "invalid user id");
   }
 
   const video = await Video.aggregate([
     {
       $match: {
-        owner: new mongoose.Types.ObjectId(userId), isPublished: true
-      }
-    },
-    {
-      $sort: {
-        createdAt: sortType === "asc" ? 1 : -1
-      }
-    },
-    {
-      $skip: (page - 1) * limit
-    },
-    {
-      $limit: parseInt(limit)
+        owner: new mongoose.Types.ObjectId(userId),
+        isPublished: true,
+      },
     },
     {
       $lookup: {
@@ -458,18 +467,29 @@ const getUserVideo = asyncHandler( async(req, res) => {
               avatar: 1,
               userName: 1,
               firstName: 1,
-              lastName: 1
-            }
-          }
-        ]
-      }
+              lastName: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $sort: {
+        createdAt: sortType === "asc" ? 1 : -1,
+      },
+    },
+    {
+      $skip: (page - 1) * limit,
+    },
+    {
+      $limit: parseInt(limit),
     },
     {
       $addFields: {
         owner: {
-          $first: "$owner"
-        }
-      }
+          $first: "$owner",
+        },
+      },
     },
     {
       $project: {
@@ -482,19 +502,26 @@ const getUserVideo = asyncHandler( async(req, res) => {
         description: 1,
         duration: 1,
         views: 1,
-        isPublished:1 
-      }
-    }
-  ])
+        isPublished: 1,
+      },
+    },
+  ]);
 
-  console.log(video)
-
-  if(!video){
-    throw new ApiError(401, "Error while fetching video")
+  if (!video) {
+    throw new ApiError(401, "Error while fetching video");
   }
 
-  return res.status(200).json(
-    new ApiResponse(201, "fetched user videos", video)
-  )
-})
-export { publishVideo, getAllVideos, getVideoById, deleteVideos, updateVideo, togglePublish, getUserVideo };
+  return res
+    .status(200)
+    .json(new ApiResponse(201, "fetched user videos", video));
+});
+
+export {
+  publishVideo,
+  getAllVideos,
+  getVideoById,
+  deleteVideos,
+  updateVideo,
+  togglePublish,
+  getUserVideo,
+};

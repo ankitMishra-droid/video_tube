@@ -28,7 +28,7 @@ const getUserVideo = async (
     const dataRes = await response.json();
     
     if (dataRes?.data) {
-      dispatch(addUserVideos(dataRes.data));
+      dispatch(addUserVideos(dataRes?.data));
       return dataRes.data;
     }
   } catch (error) {
