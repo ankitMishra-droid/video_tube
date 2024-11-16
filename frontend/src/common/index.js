@@ -32,6 +32,10 @@ const fetchApi = {
     getUserVideo: {
         url: `${backendDomain}/api/video/c`,
         method: "GET"
+    },
+    getUserPlayList: {
+        url: `${backendDomain}/api/playlist`,
+        method: "GET"
     }
 }
 

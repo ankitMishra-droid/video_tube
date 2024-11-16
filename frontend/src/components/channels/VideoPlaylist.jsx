@@ -1,9 +1,10 @@
 import React from 'react'
+import ChannelEmptyPlayList from './ChannelEmptyPlayList'
 
 const VideoPlaylist = () => {
   return (
     <div>
-      VideoPlaylist
+      <ChannelEmptyPlayList />
     </div>
   )
 }
