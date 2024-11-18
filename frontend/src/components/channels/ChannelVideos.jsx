@@ -16,8 +16,6 @@ const ChannelVideos = () => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state?.user?.user?._id);
 
-  console.log(userId)
-
   useEffect(() => {
     if (page === 1) {
       dispatch(removeUserVideos());
@@ -31,8 +29,6 @@ const ChannelVideos = () => {
   }, [userId, sortType, page]);
 
   const videos = useSelector((state) => state?.user?.userVideo);
-
-  console.log(videos);
 
   const fetchMoreData = () => {
     setPage((prev) => prev + 1);

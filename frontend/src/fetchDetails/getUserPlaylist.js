@@ -1,7 +1,7 @@
 import fetchApi from "@/common";
 import { addUserPlaylist } from "@/features/userSlice";
 
-const getUserPlayList = async (dispatch) => {
+const getUserPlayList = async (dispatch, userId) => {
     try {
         const response = await fetch(`${fetchApi.getUserPlayList.url}/u/${userId}`, {
             method: fetchApi.getUserPlayList.method,
@@ -10,7 +10,6 @@ const getUserPlayList = async (dispatch) => {
 
         const dataRes = await response.json();
 
-        console.log(dataRes)
         if(dataRes?.data){
             dispatch(addUserPlaylist(dataRes?.data));
             return dataRes.data

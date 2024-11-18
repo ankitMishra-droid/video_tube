@@ -1,44 +1,139 @@
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
+import fetchApi from "@/common";
+import { updatePlaylists } from "@/features/playlistSlice";
+import getUserPlayList from "@/fetchDetails/getUserPlaylist";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const PlaylistForm = ({playlist, route}, ref) => {
+const PlaylistForm = ({ playlist, route }, ref) => {
     const userId = useSelector((state) => state?.user?.user?._id);
-    const dispatch = useDispatch() 
-    const navigate = useNavigate()
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const dialog = useRef();
 
-    const dialog = useRef()
+    const [data, setData] = useState({
+        content: playlist?.content || "",
+        description: playlist?.description || "",
+    });
+    const [showPopup, setShowPopup] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const [showPopup, setShowPopup] = useState(false)
-    const [loading, setLoading] = useState(false)
-
-    useImperativeHandle(ref, () => {
-        return{
-            open(){
-                setShowPopup(true)
+    useImperativeHandle(
+        ref,
+        () => ({
+            open() {
+                setShowPopup(true);
             },
-            close(){
-                handleClose()
-            }
-        }
-    }, [])
+            close() {
+                handleClose();
+            },
+        }),
+        []
+    );
 
     useEffect(() => {
-        if(showPopup){
-            dialog.current.showModal()
+        if (showPopup) {
+            dialog.current.showModal();
         }
-    },[showPopup])
+    }, [showPopup]);
 
     const handleClose = () => {
         dialog.current.close();
-        setShowPopup(false)
-        if(route) navigate(route)
-    }
-  return (
-    <div>
-      
-    </div>
-  )
-}
+        setShowPopup(false);
+        if (route) navigate(route);
+    };
 
-export default PlaylistForm
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleUpdatePlaylist = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const url = playlist
+                ? `${fetchApi.getUserPlayList.url}/${playlist._id}`
+                : fetchApi.getUserPlayList.url;
+
+            const method = playlist ? "PATCH" : "POST";
+
+            const response = await fetch(url, {
+                method,
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const dataRes = await response.json();
+
+            if (dataRes?.data) {
+                if (playlist) {
+                    dispatch(
+                        updatePlaylists({
+                            content: dataRes.data.content,
+                            description: dataRes.data.description,
+                        })
+                    );
+                } else {
+                    getUserPlayList(dispatch, userId);
+                }
+                toast.success(dataRes?.message || "Playlist updated successfully");
+            }
+
+            handleClose();
+        } catch (error) {
+            toast.error("Something went wrong");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="absolute">
+            {showPopup &&
+                createPortal(
+                    <dialog ref={dialog} className="playlist-dialog" onClose={handleClose}>
+                        <div className="relative">
+                            <form onSubmit={handleUpdatePlaylist}>
+                                <div>
+                                    <label>Name</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter playlist name"
+                                        value={data.content}
+                                        name="content"
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div>
+                                    <label>Description</label>
+                                    <textarea
+                                        placeholder="Enter playlist description"
+                                        value={data.description}
+                                        name="description"
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <button type="submit" disabled={loading}>
+                                    {loading ? "Updating..." : "Update"}
+                                </button>
+                            </form>
+                        </div>
+                    </dialog>,
+                    document.body
+                )}
+        </div>
+    );
+};
+
+export default React.forwardRef(PlaylistForm);
