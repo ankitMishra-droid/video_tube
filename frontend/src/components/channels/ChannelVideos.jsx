@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import EmptyChannelVideos from "./EmptyChannelVideos";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUserVideos } from "@/features/userSlice";
@@ -8,30 +8,48 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import VideoCard from "../video/VideoCard";
 
 const ChannelVideos = () => {
-  
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [sortType, setSortType] = useState("desc");
   const dispatch = useDispatch();
   const userId = useSelector((state) => state?.user?.user?._id);
+  const videos = useSelector((state) => state?.user?.userVideo);
+  const initialFetchRef = useRef(false); // To prevent redundant fetching on initial render.
 
   useEffect(() => {
+    // Prevent re-fetching on initial render or duplicate calls.
+    if (!userId || initialFetchRef.current) return;
+
+    // Clear previous videos on new user/session.
     if (page === 1) {
       dispatch(removeUserVideos());
     }
+
+    // Fetch videos.
+    setLoading(true);
     getUserVideo(dispatch, userId, sortType, page).then((data) => {
       setLoading(false);
       if (data.length !== 10) {
         setHasMore(false);
       }
     });
-  }, [userId, sortType, page]);
 
-  const videos = useSelector((state) => state?.user?.userVideo);
+    initialFetchRef.current = true; // Mark as fetched.
+  }, [userId, sortType, page, dispatch]);
 
   const fetchMoreData = () => {
     setPage((prev) => prev + 1);
+  };
+
+  const handleSortChange = (type) => {
+    if (sortType !== type) {
+      setSortType(type);
+      setPage(1);
+      setHasMore(true); // Reset pagination.
+      setLoading(true);
+      initialFetchRef.current = false; // Allow fresh fetch.
+    }
   };
 
   if (loading) {
@@ -41,6 +59,7 @@ const ChannelVideos = () => {
       </span>
     );
   }
+
   return videos && videos.length < 1 ? (
     <div>
       <EmptyChannelVideos />
@@ -52,11 +71,10 @@ const ChannelVideos = () => {
         next={fetchMoreData}
         hasMore={hasMore}
         loader={
-          <div className="flex justify-center h-7 mt-1`">
+          <div className="flex justify-center h-7 mt-1">
             <img src={loader} width={60} height={60} alt="loaderGif" />
           </div>
         }
-        scrollableTarget="scrollableDiv"
       >
         <div className="flex mx-2">
           <button
@@ -64,11 +82,7 @@ const ChannelVideos = () => {
             className={`px-3 ${
               sortType === "desc" ? "bg-pink-500" : "bg-slate-700"
             }`}
-            onClick={() => {
-              setSortType("desc");
-              setPage(1);
-              setLoading(true);
-            }}
+            onClick={() => handleSortChange("desc")}
           >
             Latest
           </button>
@@ -77,25 +91,20 @@ const ChannelVideos = () => {
             className={`px-3 ${
               sortType === "asc" ? "bg-pink-500" : "bg-slate-700"
             }`}
-            onClick={() => {
-              setSortType("desc");
-              setPage(1);
-              setLoading(true);
-            }}
+            onClick={() => handleSortChange("asc")}
           >
             Oldest
           </button>
         </div>
-        <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-3 gap-2 ${videos?.length < 4 && "sm:grid-cols-[repeat(auto-fit, _minmax(300px, 0.34fr))] 2xl:grid-cols-[repeat(auto-fit, _minmax(300px, 0.24fr))]"}`}>
-          {
-            videos.map((video) => (
-              <VideoCard 
-                key={video?._id+1}
-                video={video}
-                name={false}
-              />
-            ))
-          }
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-3 gap-2 ${
+            videos?.length < 4 &&
+            "sm:grid-cols-[repeat(auto-fit,_minmax(300px,_0.34fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(300px,_0.24fr))]"
+          }`}
+        >
+          {videos.map((video) => (
+            <VideoCard key={video?._id} video={video} name={false} />
+          ))}
         </div>
       </InfiniteScroll>
     </div>

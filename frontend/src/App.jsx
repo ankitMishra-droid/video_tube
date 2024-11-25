@@ -52,10 +52,14 @@ function App() {
           hideProgressBar
         />
         <div className="">
-          <SideBarNav setIsSidebarIsOpen={setIsSidebarOpen}/>
+          <SideBarNav setIsSidebarIsOpen={setIsSidebarOpen} />
         </div>
-          <Header />
-        <main className={`px-3 py-2 flex-1 transition-all delay-0 ${isSidebarOpen ? "p-3 ml-64" : "ml-0 2xl:container"} block m-auto`}>
+        <Header />
+        <main
+          className={`px-3 py-2 flex-1 transition-all delay-0 ${
+            isSidebarOpen ? "p-3 ml-64" : "ml-0 container sm:mx-auto"
+          }`}
+        >
           <Outlet />
         </main>
       </main>

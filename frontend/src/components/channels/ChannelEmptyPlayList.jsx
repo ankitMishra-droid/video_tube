@@ -9,9 +9,6 @@ const ChannelEmptyPlayList = ({ videos = false }) => {
     const userData = useSelector((state) => state.auth.user);
     const user = useSelector((state) => state.user.user);
 
-    console.log("empty playlist1: ", user)
-    console.log("empty playlist2: ", userData)
-
     const dialog = useRef();
 
     const playlistPopup = () => {

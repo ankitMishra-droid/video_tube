@@ -7,7 +7,7 @@ const getUserPlayList = async (dispatch, userId) => {
             method: fetchApi.getUserPlayList.method,
             credentials: "include"
         })
-
+        
         const dataRes = await response.json();
 
         if(dataRes?.data){

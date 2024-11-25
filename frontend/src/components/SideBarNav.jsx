@@ -21,7 +21,7 @@ import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import { removeUserDetails } from "@/features/authSlice";
 
-const SideBarNav = ({setIsSidebarIsOpen}) => {
+const SideBarNav = ({ setIsSidebarIsOpen }) => {
   const [show, setShow] = useState(true);
 
   const authStatus = useSelector((state) => state?.auth?.status);
@@ -32,7 +32,7 @@ const SideBarNav = ({setIsSidebarIsOpen}) => {
 
   const toggleShow = () => {
     setShow(!show);
-    setIsSidebarIsOpen(!show)
+    setIsSidebarIsOpen(!show);
   };
 
   const handleLogout = async () => {
@@ -166,7 +166,9 @@ const SideBarNav = ({setIsSidebarIsOpen}) => {
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <LogOut />
-                    <span className="flex-1 ms-3 whitespace-nowrap">Logout</span>
+                    <span className="flex-1 ms-3 whitespace-nowrap">
+                      Logout
+                    </span>
                   </button>
                 </li>
                 <li>

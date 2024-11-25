@@ -8,132 +8,136 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const PlaylistForm = ({ playlist, route }, ref) => {
-    const userId = useSelector((state) => state?.user?.user?._id);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const dialog = useRef();
+  const userId = useSelector((state) => state?.user?.user?._id);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dialog = useRef();
 
-    const [data, setData] = useState({
-        content: playlist?.content || "",
-        description: playlist?.description || "",
-    });
-    const [showPopup, setShowPopup] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({
+    content: playlist?.content || "",
+    description: playlist?.description || "",
+  });
+  const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            open() {
-                setShowPopup(true);
-            },
-            close() {
-                handleClose();
-            },
-        }),
-        []
-    );
+  useImperativeHandle(
+    ref,
+    () => ({
+      open() {
+        setShowPopup(true);
+      },
+      close() {
+        handleClose();
+      },
+    }),
+    []
+  );
 
-    useEffect(() => {
-        if (showPopup) {
-            dialog.current.showModal();
+  useEffect(() => {
+    if (showPopup) {
+      dialog.current.showModal();
+    }
+  }, [showPopup]);
+
+  const handleClose = () => {
+    dialog.current.close();
+    setShowPopup(false);
+    if (route) navigate(route);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleUpdatePlaylist = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const url = playlist
+        ? `${fetchApi.getUserPlayList.url}/${playlist._id}`
+        : fetchApi.getUserPlayList.url;
+
+      const method = playlist ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const dataRes = await response.json();
+
+      if (dataRes?.data) {
+        if (playlist) {
+          dispatch(
+            updatePlaylists({
+              content: dataRes.data.content,
+              description: dataRes.data.description,
+            })
+          );
+        } else {
+          getUserPlayList(dispatch, userId);
         }
-    }, [showPopup]);
+        toast.success(dataRes?.message || "Playlist updated successfully");
+      }
 
-    const handleClose = () => {
-        dialog.current.close();
-        setShowPopup(false);
-        if (route) navigate(route);
-    };
+      handleClose();
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleUpdatePlaylist = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-            const url = playlist
-                ? `${fetchApi.getUserPlayList.url}/${playlist._id}`
-                : fetchApi.getUserPlayList.url;
-
-            const method = playlist ? "PATCH" : "POST";
-
-            const response = await fetch(url, {
-                method,
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            const dataRes = await response.json();
-
-            if (dataRes?.data) {
-                if (playlist) {
-                    dispatch(
-                        updatePlaylists({
-                            content: dataRes.data.content,
-                            description: dataRes.data.description,
-                        })
-                    );
-                } else {
-                    getUserPlayList(dispatch, userId);
-                }
-                toast.success(dataRes?.message || "Playlist updated successfully");
-            }
-
-            handleClose();
-        } catch (error) {
-            toast.error("Something went wrong");
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <div className="absolute">
-            {showPopup &&
-                createPortal(
-                    <dialog ref={dialog} className="playlist-dialog" onClose={handleClose}>
-                        <div className="relative">
-                            <form onSubmit={handleUpdatePlaylist}>
-                                <div>
-                                    <label>Name</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter playlist name"
-                                        value={data.content}
-                                        name="content"
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Description</label>
-                                    <textarea
-                                        placeholder="Enter playlist description"
-                                        value={data.description}
-                                        name="description"
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <button type="submit" disabled={loading}>
-                                    {loading ? "Updating..." : "Update"}
-                                </button>
-                            </form>
-                        </div>
-                    </dialog>,
-                    document.body
-                )}
-        </div>
-    );
+  return (
+    <div className="absolute">
+      {showPopup &&
+        createPortal(
+          <dialog
+            ref={dialog}
+            className="playlist-dialog"
+            onClose={handleClose}
+          >
+            <div className="relative">
+              <form onSubmit={handleUpdatePlaylist}>
+                <div>
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter playlist name"
+                    value={data.content}
+                    name="content"
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label>Description</label>
+                  <textarea
+                    placeholder="Enter playlist description"
+                    value={data.description}
+                    name="description"
+                    onChange={handleChange}
+                  />
+                </div>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Updating..." : "Update"}
+                </button>
+              </form>
+            </div>
+          </dialog>,
+          document.body
+        )}
+    </div>
+  );
 };
 
 export default React.forwardRef(PlaylistForm);
