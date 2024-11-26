@@ -56,6 +56,7 @@ const ScrollableNavigation = () => {
     { label: "Videos", path: "" },
     { label: "Playlist", path: "playlist" },
     { label: "Tweets", path: "tweets" },
+    { label: "Subscribed", path: "subscribed" },
     { label: "About", path: "about" },
   ];
 

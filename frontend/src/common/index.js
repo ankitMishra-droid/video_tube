@@ -37,6 +37,10 @@ const fetchApi = {
         url: `${backendDomain}/api/playlist`,
         method: "GET"
     },
+    getUserSubscriber: {
+        url: `${backendDomain}/api/subscribe`,
+        method: "GET"
+    }
 }
 
 export default fetchApi
