@@ -33,13 +33,13 @@ const ChannelEmptyPlayList = ({ videos = false }) => {
                         </p>
                         <PlaylistForm ref={dialog} />
                         {!videos && (
-                            <Button
+                            <button
                                 onClick={playlistPopup}
-                                className="inline-flex items-center bg-black"
+                                className="inline-flex items-center bg-gray-800 text-white transition-all px-3 gap-x-2 py-2 my-5 hover:bg-black rounded-md"
                             >
                                 <PlusIcon />
                                 <span>New PlayList</span>
-                            </Button>
+                            </button>
                         )}
                     </div>
                 </div>

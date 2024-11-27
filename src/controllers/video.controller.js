@@ -342,8 +342,6 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     const { title, description } = req.body;
 
-    console.log(title, description);
-
     if (!(title && description)) {
       throw new Error("all fields are required");
     }

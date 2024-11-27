@@ -1,115 +1,198 @@
 import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Subscription } from "../models/subscription.model.js";
-import mongoose, { isValidObjectId, mongo } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
 
-const toggleSubscription = asyncHandler( async(req, res) => {
-    try {
-        const { channelID } = req.params;
+const toggleSubscription = asyncHandler(async (req, res) => {
+  const { channelID } = req.params;
 
-        // console.log(channelID)
-        if(!isValidObjectId(channelID)){
-            throw new Error("invalid id")
-        }
+  if (!channelID || !isValidObjectId(channelID)) {
+    return res.status(400).json(new ApiError(400, "Invalid channel ID"));
+  }
 
-        const existedSubcription = await Subscription.findOne({
-            subscriber: req.user?._id,
-            channel: channelID
-        })
+  try {
+    const existingSubscription = await Subscription.findOne({
+      subscriber: req.user?._id,
+      channel: channelID,
+    });
 
-        if(existedSubcription){
-            await Subscription.findByIdAndDelete(existedSubcription?._id)
+    if (existingSubscription) {
+      // Unsubscribe logic
+      const unsubscribe = await Subscription.findByIdAndDelete(
+        existingSubscription._id
+      );
 
-            return res.status(200).json(
-                new ApiResponse(201, "Unsubscribed", { subscribed: false })
-            )
-        }
+      if (!unsubscribe) {
+        throw new ApiError(500, "Error while unsubscribing");
+      }
 
-        await Subscription.create({
-            subscriber: req.user?._id,
-            channel: channelID
-        })
+      return res
+        .status(200)
+        .json(new ApiResponse(200, "Unsubscribed successfully"));
+    } else {
+      // Subscribe logic
+      const subscribe = await Subscription.create({
+        subscriber: req.user?._id,
+        channel: channelID,
+      });
 
-        return res.status(200).json(
-            new ApiResponse(201, "Subscribed", { subscribed: true })
-        )
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: error?.message || "something went wrong",
-            error: true,
-            success: false
-        })
+      if (!subscribe) {
+        throw new ApiError(500, "Error while subscribing");
+      }
+
+      return res.status(200).json(new ApiResponse(200, "Subscribed successfully"));
     }
-})
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: error.message || "Something went wrong",
+      error: true,
+      success: false,
+    });
+  }
+});
 
-const getSubscribedChannels = asyncHandler( async(req, res) => {
-    try {
-        const { subscribedId } = req.params;
-    
-        if(!isValidObjectId(subscribedId)){
-            throw new Error("invalid id")
-        }
+const getSubscribedChannels = asyncHandler(async (req, res) => {
+  const { subscribedId } = req.params;
 
-        const id = new mongoose.Types.ObjectId(subscribedId)
-    
-        const subscribe = await Subscription.aggregate([
-            {
-                $match: { subscriber: id }
-            },
-            {
-                $project: {
-                    channel: 1
-                }
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "channel",
-                    foreignField: "_id",
-                    as: "subscriptionChannel"
-                }
-            }
-        ])
-    
-        return res.status(200).json(
-            new ApiResponse(201, "subscribed channels", subscribe)
-        )
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: error?.message || "somthing went wrong",
-            error: true,
-            success: false
-        })
+  if (!isValidObjectId(subscribedId)) {
+    return res.status(400).json(new ApiError(400, "Invalid subscriber ID"));
+  }
+
+  try {
+    const subscriptions = await Subscription.aggregate([
+      {
+        $match: { subscriber: new mongoose.Types.ObjectId(subscribedId) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "channel",
+          foreignField: "_id",
+          as: "channelDetails",
+        },
+      },
+      { $unwind: "$channelDetails" },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "channel",
+          foreignField: "channel",
+          as: "subscribersChannel",
+        },
+      },
+      {
+        $addFields: {
+          "channelDetails.isSubscribed": {
+            $in: [req.user?._id, "$subscribersChannel.subscriber"],
+          },
+          "channelDetails.subscribersCount": {
+            $size: "$subscribersChannel",
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          channels: { $push: "$channelDetails" },
+          totalChannels: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          channels: {
+            _id: 1,
+            isSubscribed: 1,
+            subscribersCount: 1,
+            userName: 1,
+            avatar: 1,
+            firstName: 1,
+            lastName: 1,
+          },
+          channelsCount: "$totalChannels"
+        },
+      },
+    ]);
+
+    if (!subscriptions) {
+      throw new ApiError(404, "No subscribed channels found");
     }
-})
 
-const getUserChannelSubscribers = asyncHandler(async( req, res) => {
-    try {
-        const { channelID } = req.params;
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Subscribed channels fetched", subscriptions));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: error.message || "Something went wrong",
+      error: true,
+      success: false,
+    });
+  }
+});
 
-        if(!isValidObjectId(channelID)){
-            throw new Error("invalid id")
-        }
+const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+  const { channelID } = req.params;
 
-        const subscriber = await Subscription.aggregate([
-            {
-                $match: { channel: new mongoose.Types.ObjectId(channelID) }
-            }
-        ])
+  if (!isValidObjectId(channelID)) {
+    return res.status(400).json(new ApiError(400, "Invalid channel ID"));
+  }
 
-        return res.status(200).json(
-            new ApiResponse(201, "Fetch subscribers details successfully", subscriber)
-        )
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            message: error?.message || "something went wrong",
-            error: true,
-            success: false
-        })
+  try {
+    const subscribers = await Subscription.aggregate([
+      {
+        $match: { channel: new mongoose.Types.ObjectId(channelID) },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "subscriber",
+          foreignField: "_id",
+          as: "subscribers",
+        },
+      },
+      { $unwind: "$subscribers" },
+      {
+        $group: {
+          _id: null,
+          subscribers: { $push: "$subscribers" },
+          totalSubscribers: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          subscribers: {
+            _id: 1,
+            userName: 1,
+            avatar: 1,
+            firstName: 1,
+            lastName: 1,
+          },
+          subscribersCount: "$totalSubscribers",
+        },
+      },
+    ]);
+
+    if (!subscribers.length) {
+      throw new ApiError(404, "No subscribers found");
     }
-})
 
-export { toggleSubscription, getSubscribedChannels, getUserChannelSubscribers }
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, "Subscribers fetched successfully", subscribers)
+      );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: error.message || "Something went wrong",
+      error: true,
+      success: false,
+    });
+  }
+});
+
+export { toggleSubscription, getSubscribedChannels, getUserChannelSubscribers };

@@ -1,6 +1,7 @@
 import fetchApi from "@/common";
 import { updatePlaylists } from "@/features/playlistSlice";
 import getUserPlayList from "@/fetchDetails/getUserPlaylist";
+import { Cross, CrossIcon, X } from "lucide-react";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -99,38 +100,47 @@ const PlaylistForm = ({ playlist, route }, ref) => {
   };
 
   return (
-    <div className="absolute">
+    <div className="absolute rounded-md">
       {showPopup &&
         createPortal(
           <dialog
             ref={dialog}
-            className="playlist-dialog"
+            className="playlist-dialog rounded-md sm:w-2/4 lg:w-1/3 w-full"
             onClose={handleClose}
           >
             <div className="relative">
-              <form onSubmit={handleUpdatePlaylist}>
-                <div>
-                  <label>Name</label>
+              <form onSubmit={handleUpdatePlaylist} className="py-4 px-3">
+                <div className="absolute top-3 right-3">
+                <button onClick={handleClose} className="px-3 py-1 transition-all">
+                  <X />
+                </button>
+                </div>
+                <div className="my-3 flex flex-col justify-center">
+                  <label className="">Name</label>
                   <input
                     type="text"
                     placeholder="Enter playlist name"
                     value={data.content}
                     name="content"
                     onChange={handleChange}
+                    className="p-2 border-2 border-slate-700 rounded-sm focus:outline-slate-900"
                   />
                 </div>
-                <div>
-                  <label>Description</label>
+                <div className="my-3 flex flex-col justify-center">
+                  <label className="">Description</label>
                   <textarea
                     placeholder="Enter playlist description"
                     value={data.description}
                     name="description"
                     onChange={handleChange}
+                    className="p-2 border-2 border-slate-700 rounded-sm focus:outline-slate-900"
                   />
                 </div>
-                <button type="submit" disabled={loading}>
+                <div className="mx-2 my-3 flex justify-end">
+                <button type="submit" disabled={loading} className="text-end bg-slate-700 px-3 py-1 rounded-md text-white hover:bg-slate-900 transition-all">
                   {loading ? "Updating..." : "Update"}
                 </button>
+                </div>
               </form>
             </div>
           </dialog>,

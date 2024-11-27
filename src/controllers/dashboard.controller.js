@@ -55,8 +55,6 @@ const getChannelStats = asyncHandler( async(req, res) => {
             }
         ])
 
-        console.log(video)
-
         const channelStats = {
             subscriberCount: subscriberCount || 0,
             subscribedChannelCount: subscribedChannelCount || 0,

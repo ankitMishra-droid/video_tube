@@ -33,7 +33,7 @@ const SubscriptionCards = ({ profile }) => {
         );
 
         const resData = await response.json();
-
+        console.log(resData)
         if (resData.data) {
           dispatch(
             toggleUserSubscribed({
