@@ -1,66 +1,55 @@
 import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
-import User from "../models/users.model.js";
 import { Video } from "../models/video.model.js";
 import crypto from "crypto";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
-import path from "path";
-import { getVideoDurationInSeconds } from "get-video-duration";
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
     const { title, description } = req.body;
 
-    const videoFile = req.files?.videoFile[0]?.path;
-
-    // console.log(req)
-    const thumbnailFile = req.files?.thumbnail[0]?.path;
-
-    if (!videoFile) {
+    // Ensure that files are uploaded
+    if (!req.files || !req.files.videoFile || req.files.videoFile.length === 0) {
       throw new ApiError(401, "Video file is required");
     }
 
-    if (!thumbnailFile) {
+    if (!req.files.thumbnail || req.files.thumbnail.length === 0) {
       throw new ApiError(401, "Thumbnail is required");
     }
 
-    const videoSrc = `/users_video/${req.user._id}/${path.basename(videoFile)}`;
-    const thumbnailSrc = `/users_video/${req.user._id}/${path.basename(
-      thumbnailFile
-    )}`;
+    const videoFilePath = req.files.videoFile[0].path;
+    const thumbnailFilePath = req.files.thumbnail[0].path;
 
-    // const duration = await getVideoDurationInSeconds(String(videoFile)).then((duration) => {
-    //   console.log(duration)
-    // })
+    const videoFile = await uploadOnCloudinary(videoFilePath, "videos from users");
+    const thumbnailFile = await uploadOnCloudinary(thumbnailFilePath, "thumbnail");
+
+    if (!videoFile || !thumbnailFile) {
+      throw new ApiError(500, "File upload failed");
+    }
 
     const video = await Video.create({
       title,
       description,
-      videoFile: {
-        url: videoSrc,
-        public_id: crypto.randomBytes(32).toString("hex"),
-      },
-      thumbnail: {
-        url: thumbnailSrc,
-        public_id: crypto.randomBytes(32).toString("hex"),
-      },
-      duration: await getVideoDurationInSeconds(String(videoFile)),
+      videoFile: videoFile.secure_url,
+      thumbnail: thumbnailFile.secure_url,
+      duration: videoFile.duration, // Ensure this is returned from Cloudinary
       isPublished: req.body.isPublished || false,
       owner: req.user?._id,
     });
 
+    // Ensure video was created
     const uploadedVideo = await Video.findById(video._id);
-
     if (!uploadedVideo) {
       throw new ApiError(401, "Video uploading failed.");
     }
 
-    return res
-      .status(201)
-      .json(new ApiResponse(201, "Video uploaded", uploadedVideo));
+    // Respond with success
+    return res.status(201).json(new ApiResponse(201, "Video uploaded", uploadedVideo));
+
   } catch (error) {
     console.log(error);
     return res.status(500).json(new ApiError(500, "Something went wrong"));
@@ -78,93 +67,96 @@ const getAllVideos = asyncHandler(async (req, res) => {
       userId,
     } = req.query;
 
-    const sortByField = ["createdAt", "duration", "views"];
-    const sortTypeArr = ["asc", "dsc"];
+    // Validate sortBy field
+    const validSortByFields = ["createdAt", "duration", "views"];
+    if (!validSortByFields.includes(sortBy)) {
+      throw new ApiError(400, "Invalid 'sortBy' field. Valid options are: createdAt, duration, views.");
+    }
 
-    // if(!sortByField.includes(sortBy) || !sortTypeArr.includes(sortType)){
-    //     throw new ApiError(401, "please select filter field")
-    // }
+    // Validate sortType
+    const validSortTypes = ["asc", "desc"];
+    if (!validSortTypes.includes(sortType)) {
+      throw new ApiError(400, "Invalid 'sortType'. Valid options are: asc, desc.");
+    }
 
-    const getVideo = await Video.aggregate([
+    // Create the aggregation pipeline
+    const matchConditions = {
+      isPublished: true,  // Always filter for published videos
+    };
+
+    // If a search query is provided, include it in the match condition
+    if (query) {
+      matchConditions.$or = [
+        { title: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+      ];
+    }
+
+    // Aggregation pipeline to retrieve videos
+    const videos = await Video.aggregate([
       {
-        $match: {
-          $or: [
-            {
-              owner: userId ? new mongoose.Types.ObjectId(userId) : null,
-            },
-            {
-              $and: [
-                { isPublished: true },
-                {
-                  $or: [
-                    {
-                      title: query
-                        ? { $regex: query, $options: "i" }
-                        : { $exists: true },
-                    },
-                    {
-                      description: query
-                        ? { $regex: query, $options: "i" }
-                        : null,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
+        $match: matchConditions,
       },
       {
         $lookup: {
-          from: "users",
+          from: "users",  // Ensure the collection name is correct (should be "users" not "User")
           localField: "owner",
           foreignField: "_id",
           as: "owner",
           pipeline: [
             {
               $project: {
+                avatar: 1,
                 userName: 1,
                 firstName: 1,
-                avatar: 1,
+                lastName: 1,
               },
             },
           ],
         },
       },
       {
-        $sort: {
-          [sortBy]: sortType === "dsc" ? -1 : 1,
+        $addFields: {
+          owner: { $first: "$owner" },  // Get the first matched owner
         },
       },
       {
-        $addFields: {
-          owner: {
-            $first: "$owner",
-          },
+        $project: {
+          _id: 1,
+          owner: 1,
+          thumbnail: 1,
+          videoFile: 1,
+          createdAt: 1,
+          description: 1,
+          title: 1,
+          duration: 1,
+          views: 1,
+          isPublished: 1,
         },
+      },
+      {
+        $sort: {
+          [sortBy]: sortType === "desc" ? -1 : 1,  // Sorting by the selected field and type
+        },
+      },
+      {
+        $skip: (page - 1) * parseInt(limit),  // Skip for pagination
+      },
+      {
+        $limit: parseInt(limit),  // Limit the number of results per page
       },
     ]);
 
-    const result = await Video.aggregatePaginate(getVideo, {
-      page,
-      limit,
-      customLabels: {
-        totalDocs: "totalVideos",
-        docs: "Videos",
-      },
-      allowDiskUse: true,
-    });
-
-    if (result.totalPages === 0) {
-      throw new ApiError(404, "videos not found");
+    // If no videos are found, return a 404 response
+    if (videos.length === 0) {
+      throw new ApiError(404, "Videos not found");
     }
 
-    return res
-      .status(200)
-      .json(new ApiResponse(201, "vidoes fetched.", result));
+    // Return the videos in the response
+    return res.status(200).json(new ApiResponse(200, "Videos fetched successfully.", videos));
   } catch (error) {
-    console.log(error);
-    return res.status(500).json(new ApiError(500, "somthing went wrong"));
+    console.error(error);
+    return res.status(error.statusCode || 500).json(new ApiError(error.statusCode || 500, error.message || "Something went wrong"));
   }
 });
 

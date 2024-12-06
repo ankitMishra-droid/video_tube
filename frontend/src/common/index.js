@@ -40,6 +40,14 @@ const fetchApi = {
     getUserSubscriber: {
         url: `${backendDomain}/api/subscribe`,
         method: "GET"
+    },
+    getAllVideos: {
+        url: `${backendDomain}/api/video`,
+        method: "GET"
+    },
+    channelStats: {
+        url: `${backendDomain}/api/dashboard`,
+        method: "GET"
     }
 }
 

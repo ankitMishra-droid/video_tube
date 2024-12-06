@@ -29,7 +29,9 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
       return res
         .status(200)
-        .json(new ApiResponse(200, "Unsubscribed successfully"));
+        .json(
+          new ApiResponse(200, "Unsubscribed successfully")
+        );
     } else {
       // Subscribe logic
       const subscribe = await Subscription.create({
@@ -41,7 +43,11 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Error while subscribing");
       }
 
-      return res.status(200).json(new ApiResponse(200, "Subscribed successfully"));
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(200, "Subscribed successfully")
+        );
     }
   } catch (error) {
     console.error(error);
@@ -56,7 +62,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 const getSubscribedChannels = asyncHandler(async (req, res) => {
   const { subscribedId } = req.params;
 
-  if (!isValidObjectId(subscribedId)) {
+  if (!subscribedId || !isValidObjectId(subscribedId)) {
     return res.status(400).json(new ApiError(400, "Invalid subscriber ID"));
   }
 
@@ -85,13 +91,16 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
       {
         $addFields: {
           "channelDetails.isSubscribed": {
-            $in: [req.user?._id, "$subscribersChannel.subscriber"],
+            $in: [
+              req.user?._id,
+              { $map: { input: "$subscribersChannel", as: "sc", in: "$$sc.subscriber" } },
+            ],
           },
           "channelDetails.subscribersCount": {
             $size: "$subscribersChannel",
           },
         },
-      },
+      },      
       {
         $group: {
           _id: null,
@@ -111,7 +120,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
             firstName: 1,
             lastName: 1,
           },
-          channelsCount: "$totalChannels"
+          channelsCount: "$totalChannels",
         },
       },
     ]);
@@ -183,7 +192,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, "Subscribers fetched successfully", subscribers)
+        new ApiResponse(200, "Subscribers fetched successfully")
       );
   } catch (error) {
     console.error(error);

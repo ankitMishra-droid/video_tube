@@ -79,11 +79,14 @@ const VideoPlaylist = () => {
                                 </span>
                               </p>
                               <p className="">
-                              <span className="inline-block text-center">
+                                <span className="inline-block text-center">
                                   {playlist.totalViews} views
-                                  {playlist.totalViews > 1 ? "s" : ""}{" "}{
-                                    formatDate(playlist.createdAt ? playlist.createdAt : playlist.updatedAt )
-                                  }
+                                  {playlist.totalViews > 1 ? "s" : ""}{" "}
+                                  {formatDate(
+                                    playlist.createdAt
+                                      ? playlist.createdAt
+                                      : playlist.updatedAt
+                                  )}
                                 </span>
                               </p>
                             </div>

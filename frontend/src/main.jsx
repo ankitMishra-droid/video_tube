@@ -16,6 +16,7 @@ import Tweets from "./components/channels/Tweets";
 import VideoPlaylist from "./components/channels/VideoPlaylist";
 import About from "./components/channels/About";
 import ChannelSubscribed from "./components/channels/ChannelSubscribed";
+import Dashboard from "./pages/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -59,7 +60,11 @@ const router = createBrowserRouter([
             element: <ChannelSubscribed />
           }
         ]
-      }
+      },
+      {
+        path: "/admin/dashboard",
+        element: <Dashboard />
+      },
     ],
   },
   {
@@ -69,11 +74,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <RouterProvider router={router} />
       </ThemeProvider>
     </Provider>
-  </StrictMode>
+  // </StrictMode>
 );

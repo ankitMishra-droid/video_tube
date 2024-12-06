@@ -32,6 +32,7 @@ const SubscriptionCards = ({ profile }) => {
           }
         );
 
+        console.log(profile.isSubscribed)
         const resData = await response.json();
         console.log(resData)
         if (resData.data) {
@@ -71,7 +72,7 @@ const SubscriptionCards = ({ profile }) => {
           <h6 className="font-semibold">
             {profile?.firstName} {profile?.lastName}
           </h6>
-          <p>{profile?.subscribersCount}</p>
+          {/* <p>{profile?.subscribersCount}</p> */}
         </div>
       </div>
       <Button

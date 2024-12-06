@@ -2,11 +2,13 @@ import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import path from "path";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { UserToken } from "../models/Token.js";
 import crypto from "crypto"
 import sendMail from "../services/nodemailer.js";
+import { deletefromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -54,13 +56,15 @@ const createUser = asyncHandler(async (req, res) => {
           throw new ApiError(400, "Password is required");
         }
       
-        const avatarPath = req.files?.avatar ? `/${req.files.avatar[0].filename}` : "/user_profile/user.png"
-        const coverAvatarPath = req.files?.coverAvatar ? `/${req.files.coverAvatar[0].filename}` : "/user_profile/user.png"
+        const avatarPath = req.files.avatar[0].path;
+        const coverAvatarPath = req.files.coverAvatar[0].path;
 
         if(!avatarPath){
           throw new ApiError(401, "profile image is required")
         }
 
+        const avatarFile = await uploadOnCloudinary(avatarPath)
+        const coverAvatarFile = await uploadOnCloudinary(coverAvatarPath)
         // console.log(avatarPath)
 
         // Check for existing user
@@ -83,8 +87,8 @@ const createUser = asyncHandler(async (req, res) => {
           email,
           password,
           role: role || "USER",
-          avatar: avatarPath,
-          coverAvatar: coverAvatarPath
+          avatar: avatarFile,
+          coverAvatar: coverAvatarFile
         });
       
         const createdUser = await User.findOne({ _id: user._id }).select(
@@ -171,23 +175,70 @@ const logout = asyncHandler( async(req, res) => {
   }
 })
 
-const updateProfile = asyncHandler( async(req, res) => {
+const updateProfile = asyncHandler(async (req, res) => {
   try {
     const { firstName, lastName } = req.body;
 
-    const updateUser = await User.findByIdAndUpdate(req.user._id, {
-      firstName: firstName,
-      lastName: lastName
-    },{ new: true }).select("-password")
+    if (!avatarFile || !coverAvatarFile) {
+      throw new ApiError(500, "Error uploading files to Cloudinary.");
+    }
+
+    // Update the user profile
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        firstName,
+        lastName
+      },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      throw new ApiError(404, "User not found.");
+    }
 
     return res.status(200).json(
-      new ApiResponse(201, "user detail updated", updateUser)
-    )
-
+      new ApiResponse(200, "User details updated successfully", updatedUser)
+    );
   } catch (error) {
-    return res.status(500).json(new ApiError(500, { message: error?.message || "somthing went wrong" }))
+    console.error(error);
+    return res.status(500).json(new ApiError(500, { message: error?.message || "Something went wrong" }));
   }
-} )
+});
+
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatarFile = req.files?.avatar?.[0]?.path;
+
+  if (!avatarFile) {
+    throw new Error("File missing");
+  }
+
+  // Upload to Cloudinary
+  const updateImg = await uploadOnCloudinary(avatarFile);
+
+  if (!updateImg?.secure_url) {
+    throw new Error('Error while uploading avatar image');
+  }
+
+  const avatarUrl = req.user?.avatar;
+  const regex = /\/([^/]+)\.[^.]+$/;
+  const match = avatarUrl.match(regex);
+
+  if (!match) {
+    throw new Error("Couldn't find image ID of current avatar");
+  }
+
+  const imageId = match[1];
+  await deletefromCloudinary(imageId, "img");
+
+  const user = await User.findByIdAndUpdate(req.user?._id, {
+    $set: {
+      avatar: updateImg.secure_url,
+    },
+  }, { new: true }).select("-password -refreshToken");
+
+  return res.status(200).json(new ApiResponse(201, "User avatar updated", user));
+});
 
 const changePassword = asyncHandler( async(req, res) => {
   try {
@@ -475,4 +526,4 @@ const passwordReset = asyncHandler( async(req, res) => {
   }
 })
 
-export { createUser, loginUser, logout, updateProfile, changePassword, getCurrentUser, refreshAccessToken, getUserChannelProfile, getWatchHistory, sendResetLink, passwordReset };
+export { createUser, loginUser, logout, updateProfile, changePassword, getCurrentUser, refreshAccessToken, getUserChannelProfile, getWatchHistory, sendResetLink, passwordReset, updateAvatar };

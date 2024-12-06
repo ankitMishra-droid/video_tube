@@ -6,6 +6,7 @@ import { getUserVideo } from "@/fetchDetails/getUserVideos";
 import loader from "@/assets/loader.gif";
 import InfiniteScroll from "react-infinite-scroll-component";
 import VideoCard from "../video/VideoCard";
+import { useNavigate } from "react-router-dom";
 
 const ChannelVideos = () => {
   const [loading, setLoading] = useState(true);
@@ -13,20 +14,18 @@ const ChannelVideos = () => {
   const [hasMore, setHasMore] = useState(true);
   const [sortType, setSortType] = useState("desc");
   const dispatch = useDispatch();
+  const navigate = useNavigate()
   const userId = useSelector((state) => state?.user?.user?._id);
   const videos = useSelector((state) => state?.user?.userVideo);
-  const initialFetchRef = useRef(false); // To prevent redundant fetching on initial render.
+  const initialFetchRef = useRef(false);
 
   useEffect(() => {
-    // Prevent re-fetching on initial render or duplicate calls.
     if (!userId || initialFetchRef.current) return;
 
-    // Clear previous videos on new user/session.
     if (page === 1) {
       dispatch(removeUserVideos());
     }
 
-    // Fetch videos.
     setLoading(true);
     getUserVideo(dispatch, userId, sortType, page).then((data) => {
       setLoading(false);
@@ -35,7 +34,7 @@ const ChannelVideos = () => {
       }
     });
 
-    initialFetchRef.current = true; // Mark as fetched.
+    initialFetchRef.current = true;
   }, [userId, sortType, page, dispatch]);
 
   const fetchMoreData = () => {
@@ -105,6 +104,16 @@ const ChannelVideos = () => {
           {videos.map((video) => (
             <VideoCard key={video?._id} video={video} name={false} />
           ))}
+          <div>
+            <div className="flex justify-center items-center h-full bg-slate-300 rounded-md">
+              <button
+                onClick={() => navigate("/admin/dashboard")}
+                className="px-5 py-2 bg-gray-800 text-white rounded-md my-4 hover:bg-gray-900 transition-all"
+              >
+                Upload Video
+              </button>
+            </div>
+          </div>
         </div>
       </InfiniteScroll>
     </div>
