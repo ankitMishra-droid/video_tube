@@ -57,7 +57,7 @@ function App() {
         <Header />
         <main
           className={`px-3 py-2 flex-1 transition-all delay-0 ${
-            isSidebarOpen ? "p-3 ml-64" : "ml-0 container sm:mx-auto"
+            isSidebarOpen ? "p-3 ml-64" : "ml-0 2xl:container sm:mx-auto px-2"
           }`}
         >
           <Outlet />

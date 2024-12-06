@@ -30,7 +30,7 @@ const VideoCard = ({ video, name = true }) => {
                 className="w-full h-full object-cover mb-2 rounded-xl border border-gray-800"
               />
             </div>
-            <p className="absolute bottom-1 right-3">{videoLength}</p>
+            <p className="absolute bottom-1 right-3 bg-gray-950/75 px-1 rounded text-sm">{videoLength}</p>
           </div>
           <div className="flex mt-1">
             <div onClick={handdleLink} className="mt-1 flex-shrink-0">
