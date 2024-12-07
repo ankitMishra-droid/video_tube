@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 export const healthCheck = async() => {
     try {
-        const response = await fetch(`http://localhost:7000/healthCheck`)
+        const response = await fetch(`https://video-tube-indol.vercel.app/healthCheck`)
 
         const resData = await response.json()
 
