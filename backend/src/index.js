@@ -10,7 +10,7 @@ connectDB()
   .then(() => {
     console.log("MongoDB connection established.");
     app.get("/", (req, res) => {
-      res.end("Hello World")
+      res.end("Welcome")
     })
     app.listen(process.env.PORT, () => {
       console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
