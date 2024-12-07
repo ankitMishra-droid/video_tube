@@ -56,8 +56,9 @@ const createUser = asyncHandler(async (req, res) => {
           throw new ApiError(400, "Password is required");
         }
       
-        const avatarPath = req.files.avatar[0].path;
-        const coverAvatarPath = req.files.coverAvatar[0].path;
+        const avatarPath = req.files?.avatar[0]?.path;
+        console.log(avatarPath)
+        const coverAvatarPath = req.files?.coverAvatar?.path;
 
         if(!avatarPath){
           throw new ApiError(401, "profile image is required")
@@ -65,8 +66,7 @@ const createUser = asyncHandler(async (req, res) => {
 
         const avatarFile = await uploadOnCloudinary(avatarPath)
         const coverAvatarFile = await uploadOnCloudinary(coverAvatarPath)
-        // console.log(avatarPath)
-
+        
         // Check for existing user
         const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
       

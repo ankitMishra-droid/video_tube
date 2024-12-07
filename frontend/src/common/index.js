@@ -1,4 +1,4 @@
-const backendDomain = "http://localhost:7000"
+const backendDomain = "https://video-tube-indol.vercel.app"
 
 const fetchApi = {
     signup: {

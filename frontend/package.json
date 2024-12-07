@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:7000",
+  "proxy": "https://video-tube-indol.vercel.app",
   "name": "frontend",
   "private": true,
   "version": "0.0.0",

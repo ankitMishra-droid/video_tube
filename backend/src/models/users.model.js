@@ -27,11 +27,9 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      default: "/user_profile/user.png",
     },
     coverAvatar: {
       type: String,
-      default: "/user_profile/user.png",
     },
     role: {
       type: String,
