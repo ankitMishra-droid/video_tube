@@ -17,6 +17,7 @@ import VideoPlaylist from "./components/channels/VideoPlaylist";
 import About from "./components/channels/About";
 import ChannelSubscribed from "./components/channels/ChannelSubscribed";
 import Dashboard from "./pages/Dashboard";
+import Video from "./pages/Video";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/dashboard",
         element: <Dashboard />
+      },
+      {
+        path: "/video/:videoTitle/:videoId",
+        element: <Video />
       },
     ],
   },

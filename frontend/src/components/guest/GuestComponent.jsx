@@ -7,7 +7,6 @@ const GuestComponent = ({icon, title = "Please Sign in", subtitle = "", route, g
         <p>{title}</p>
       </div>
       <div>{subtitle}</div>
-      
     </div>
   )
 }

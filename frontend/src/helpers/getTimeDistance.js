@@ -1,49 +1,31 @@
-function getTimeDistance(date){
-    const now = new Date();
-    const old = new Date(date);
-    const difference = now.getTime() - old.getTime()
+function getTimeDistance(date) {
+  const now = new Date();
+  const old = new Date(date);
+  const difference = now.getTime() - old.getTime();
 
-    const secondes = Math.floor(difference / 1000);
-    const minutes = Math.floor(secondes / 60);
-    const hours = Math.floor(minutes / 24);
-    const day = Math.floor(hours / 24);
-    const weeks = Math.floor(day / 7)
-    const month = Math.floor(day / 30);
-    const year = Math.floor(month / 12);
+  const seconds = Math.floor(difference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
 
-    if(year > 0){
-        if(year === 1){
-            return `${year} year ago`;
-        }
-        return `${year} years ago`
-    }else if(month > 0){
-        if(month === 1){
-            return `${month} month ago`
-        }
-        return `${month} months ago`
-    }else if(weeks > 0){
-        if(weeks === 1){
-            return `${weeks} week ago`
-        }
-        return `${weeks} weeks ago`
-    }else if(day > 0){
-        if(day === 1){
-            return `${day} day ago`
-        }
-        return `${day} days ago`
-    }else if(hours > 0){
-        if(hours === 1){
-            return `${hours} hour ago`
-        }
-        return `${hours} hours ago`
-    }else if(minutes > 0){
-        if(minutes === 1){
-            return `${minutes} minute ago`
-        }
-        return `${minutes} minutes ago`
-    }else{
-        return "Just now"
-    }
+  if (years > 0) {
+    return years === 1 ? `${years} year ago` : `${years} years ago`;
+  } else if (months > 0) {
+    return months === 1 ? `${months} month ago` : `${months} months ago`;
+  } else if (weeks > 0) {
+    return weeks === 1 ? `${weeks} week ago` : `${weeks} weeks ago`;
+  } else if (days > 0) {
+    return days === 1 ? `${days} day ago` : `${days} days ago`;
+  } else if (hours > 0) {
+    return hours === 1 ? `${hours} hour ago` : `${hours} hours ago`;
+  } else if (minutes > 0) {
+    return minutes === 1 ? `${minutes} minute ago` : `${minutes} minutes ago`;
+  } else {
+    return "Just now";
+  }
 }
 
-export default getTimeDistance
+export default getTimeDistance;

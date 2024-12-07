@@ -48,7 +48,7 @@ const fetchApi = {
     channelStats: {
         url: `${backendDomain}/api/dashboard`,
         method: "GET"
-    }
+    },
 }
 
 export default fetchApi

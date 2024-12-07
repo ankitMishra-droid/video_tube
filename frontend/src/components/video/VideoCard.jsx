@@ -15,7 +15,7 @@ const VideoCard = ({ video, name = true }) => {
   return (
     <>
       <Link
-        to={`${video?.title}/${video?._id}`}
+        to={`video/${video?.title}/${video?._id}`}
         className="bg-black rounded-xl h-full"
       >
         <div
@@ -32,26 +32,26 @@ const VideoCard = ({ video, name = true }) => {
             </div>
             <p className="absolute bottom-1 right-3 bg-gray-950/75 px-1 rounded text-sm">{videoLength}</p>
           </div>
-          <div className="flex mt-1">
+          <div className="flex justify-center mt-1 mb-2 mx-2">
             <div onClick={handdleLink} className="mt-1 flex-shrink-0">
               <img
                 src={video?.owner?.avatar}
-                className="rounded-full w-8 h-8 object-cover"
+                className="rounded-full w-8 h-8 object-cover bg-white"
               />
             </div>
             <div className="ml-4">
               <h2
-                className="text-lg font-semibold line-clamp-2"
+                className="text-base font-semibold line-clamp-2"
                 title={video?.title}
               >
                 {video?.title}
               </h2>
               {name && (
-                <h2 className="text-gray-300">
+                <h2 className="text-gray-300 text-sm">
                   {video?.owner?.firstName} {video?.owner?.lastName}
                 </h2>
               )}
-              <p className="text-gray-400">{`${video?.views} views | ${uploadedTime}`}</p>
+              <p className="text-gray-400 text-sm">{`${video?.views} views | ${uploadedTime}`}</p>
             </div>
           </div>
         </div>
