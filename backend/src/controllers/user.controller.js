@@ -9,6 +9,7 @@ import { UserToken } from "../models/Token.js";
 import crypto from "crypto"
 import sendMail from "../services/nodemailer.js";
 import { deletefromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import { isProduction } from "../constant.js";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -136,8 +137,8 @@ const loginUser = asyncHandler( async(req, res) => {
 
     const options = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      // sameSite: "None"
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax"
     }
 
     return res.status(200)
