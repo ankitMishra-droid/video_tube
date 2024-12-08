@@ -1,6 +1,13 @@
-const backendDomain = "https://video-tube-indol.vercel.app"
+const backendDomain =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL_PROD
+    : import.meta.env.VITE_BACKEND_URL_DEV;
 
 const fetchApi = {
+    siteCheck: {
+        url: `${backendDomain}/healthCheck`,
+        method: "GET"
+    },
     signup: {
         url: `${backendDomain}/api/users/register`,
         method: "POST"
