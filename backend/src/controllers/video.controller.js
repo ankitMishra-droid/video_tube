@@ -168,10 +168,11 @@ const getVideoById = asyncHandler(async (req, res) => {
       throw new ApiError(404, "invalid videoID");
     }
 
-    const userId = req.user?._id;
-    if (!userId) {
-      throw new ApiError(404, "invalid user");
-    }
+    console.log(videoId)
+    // const userId = req.user?._id;
+    // if (!userId) {
+    //   throw new ApiError(404, "invalid user");
+    // }
 
     const fetchVideo = await Video.aggregate([
       {
@@ -210,7 +211,7 @@ const getVideoById = asyncHandler(async (req, res) => {
                 isSubscribed: {
                   $cond: {
                     if: {
-                      $in: [req.user._id, "$subscribers.subscriber"],
+                      $in: [req.user?._id, "$subscribers.subscriber"],
                     },
                     then: true,
                     else: false,

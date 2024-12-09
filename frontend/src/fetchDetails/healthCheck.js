@@ -1,8 +1,11 @@
+import fetchApi from "@/common";
 import { toast } from "react-toastify";
 
 export const healthCheck = async() => {
     try {
-        const response = await fetch(`http://localhost:7000/healthCheck`)
+        const response = await fetch(fetchApi.siteCheck.url, {
+            method: fetchApi.siteCheck.method
+        })
 
         const resData = await response.json()
 
