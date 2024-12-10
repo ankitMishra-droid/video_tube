@@ -13,7 +13,7 @@ const publishVideo = asyncHandler(async (req, res) => {
     const { title, description } = req.body;
 
     // Ensure that files are uploaded
-    if (!req.files || !req.files.videoFile || req.files.videoFile.length === 0) {
+    if (!req.files || !req.files.videoFile) {
       throw new ApiError(401, "Video file is required");
     }
 

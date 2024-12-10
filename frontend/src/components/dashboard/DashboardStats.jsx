@@ -1,29 +1,20 @@
 import { EyeIcon, PlusIcon } from "lucide-react";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import VideoForm from "../video/VideoForm";
-import fetchApi from "@/common"; // assuming fetchApi is your custom fetch utility
 
 const DashboardStats = ({ stats }) => {
   const user = useSelector((state) => state?.auth?.user);
   const formRef = useRef(null);
 
-  const handleSubmit = async (formData) => {
-    try {
-      // Send the FormData directly (no need to stringify it)
-      const response = await fetch(fetchApi.getAllVideos.url, {
-        method: "POST",
-        credentials: "include",
-        body: formData, // directly send FormData
-      });
+  // Modal open state
+  const [modalOpen, setModalOpen] = useState(false);
 
-      const resData = await response.json();
-      console.log("Video upload response:", resData);
-    } catch (error) {
-      console.error("Error during form submission:", error);
-    }
+  // Function to close the modal
+  const closeModal = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -36,9 +27,9 @@ const DashboardStats = ({ stats }) => {
           <span className="text-sm text-gray-600">Manage Your Channel</span>
         </div>
         <div className="block">
-          <Dialog className="px-5 md:px-0">
+          <Dialog open={modalOpen} onOpenChange={setModalOpen} className="px-5 md:px-0">
             <DialogTrigger asChild>
-              <Button className="flex align-middle">
+              <Button className="flex align-middle" onClick={() => setModalOpen(true)}>
                 <PlusIcon /> Upload Video
               </Button>
             </DialogTrigger>
@@ -51,7 +42,7 @@ const DashboardStats = ({ stats }) => {
               <DialogHeader>
                 <DialogTitle>Upload Video</DialogTitle>
               </DialogHeader>
-              <VideoForm ref={formRef} onSubmit={handleSubmit} />
+              <VideoForm ref={formRef} closeModal={closeModal} />
             </DialogContent>
           </Dialog>
         </div>
