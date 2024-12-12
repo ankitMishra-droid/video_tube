@@ -1,7 +1,7 @@
 import { setStats } from "@/features/dashboardSlice";
 import fetchApi from "@/common";
 import { toast } from "react-toastify";
-import { setVideo } from "@/features/videoSlice";
+import { setVideo } from "@/features/dashboardSlice";
 
 async function getDashboardStats(dispatch, userId) {
   try {
@@ -22,9 +22,13 @@ async function getDashboardStats(dispatch, userId) {
 
 async function getChannelVideos(dispatch, userId) {
     try {
-        const response = await fetch(`${fetchApi.channelStats.url}/${userId}`);
+        const response = await fetch(`${fetchApi.channelStats.url}/videos/${userId}`,{
+          method: "GET",
+          credentials: "include"
+        });
     
         const resData = await response.json();
+        console.log(resData)
         if(resData.data){
             dispatch(setVideo(resData.data))
             return resData.data

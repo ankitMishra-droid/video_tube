@@ -1,6 +1,7 @@
 import {
   History,
   Home,
+  LayoutDashboard,
   LogOut,
   MessageCircle,
   Play,
@@ -140,6 +141,19 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                   <Play />
                   <span className="flex-1 ms-3 whitespace-nowrap">Videos</span>
                 </Link>
+              </li>
+              <li>
+                {authStatus && (
+                  <Link
+                    to={`/admin/dashboard`}
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  >
+                    <LayoutDashboard />
+                    <span className="flex-1 ms-3 whitespace-nowrap">
+                      Dashboard
+                    </span>
+                  </Link>
+                )}
               </li>
               <li>
                 <Link

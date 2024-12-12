@@ -43,7 +43,7 @@ const VideoPlaylist = () => {
       {playlists.length > 0 ? (
         <div>
           {status && userData?.userName === userName && (
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center my-5">
               <Button onClick={popupModal}>New Playlist</Button>
             </div>
           )}

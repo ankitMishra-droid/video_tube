@@ -168,7 +168,6 @@ const getVideoById = asyncHandler(async (req, res) => {
       throw new ApiError(404, "invalid videoID");
     }
 
-    console.log(videoId)
     // const userId = req.user?._id;
     // if (!userId) {
     //   throw new ApiError(404, "invalid user");

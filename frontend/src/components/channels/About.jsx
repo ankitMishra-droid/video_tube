@@ -12,6 +12,11 @@ const About = () => {
   const [loading, setLoading] = useState(true);
   const [aboutChannel, setAboutChannel] = useState(null);
 
+  const domain =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL_PROD
+    : import.meta.env.VITE_BACKEND_URL_DEV;
+
   const getAboutDetails = async () => {
     try {
       const response = await fetch(
@@ -62,7 +67,7 @@ const About = () => {
         </div>
         <div className="flex items-center mb-1 gap-2">
           <GlobeIcon />
-          <Link to={`/channel/${userName}`}>{`http:localhost:5173/channel/${userName}`}</Link>
+          <Link to={`/channel/${userName}`}>{`${domain}/channel/${userName}`}</Link>
         </div>
         <div className="flex items-center mb-1 gap-2">
           <Video />

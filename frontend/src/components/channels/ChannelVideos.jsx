@@ -7,6 +7,7 @@ import loader from "@/assets/loader.gif";
 import InfiniteScroll from "react-infinite-scroll-component";
 import VideoCard from "../video/VideoCard";
 import { useNavigate } from "react-router-dom";
+import { PlusIcon } from "lucide-react";
 
 const ChannelVideos = () => {
   const [loading, setLoading] = useState(true);
@@ -14,7 +15,7 @@ const ChannelVideos = () => {
   const [hasMore, setHasMore] = useState(true);
   const [sortType, setSortType] = useState("desc");
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const userId = useSelector((state) => state?.user?.user?._id);
   const videos = useSelector((state) => state?.user?.userVideo);
   const initialFetchRef = useRef(false);
@@ -75,26 +76,40 @@ const ChannelVideos = () => {
           </div>
         }
       >
-        <div className="flex mx-2">
-          <button
-            type="button"
-            className={`px-3 ${
-              sortType === "desc" ? "bg-pink-500" : "bg-slate-700"
-            }`}
-            onClick={() => handleSortChange("desc")}
-          >
-            Latest
-          </button>
-          <button
-            type="button"
-            className={`px-3 ${
-              sortType === "asc" ? "bg-pink-500" : "bg-slate-700"
-            }`}
-            onClick={() => handleSortChange("asc")}
-          >
-            Oldest
-          </button>
+        <div className="flex mx-2 justify-between items-center">
+          <div className="flex justify-center items-center flex-col sm:flex-row gap-y-1">
+            <button
+              type="button"
+              className={`px-3 ${
+                sortType === "desc" ? "bg-pink-500" : "bg-slate-700"
+              }`}
+              onClick={() => handleSortChange("desc")}
+            >
+              Latest
+            </button>
+            <button
+              type="button"
+              className={`px-3 ${
+                sortType === "asc" ? "bg-pink-500" : "bg-slate-700"
+              }`}
+              onClick={() => handleSortChange("asc")}
+            >
+              Oldest
+            </button>
+          </div>
+          <div>
+            <button
+              onClick={() => navigate(`/admin/dashboard`)}
+              className="flex items-center gap-2 px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-all"
+            >
+             <PlusIcon /> Upload Video
+            </button>
+          </div>
         </div>
+        
+        <p className="text-slate-700 font-semibold mt-3">
+            Total Videos Uploaded: {videos.length}
+          </p>
         <div
           className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-3 gap-2 ${
             videos?.length < 4 &&
@@ -104,16 +119,6 @@ const ChannelVideos = () => {
           {videos.map((video) => (
             <VideoCard key={video?._id} video={video} name={false} />
           ))}
-          <div>
-            <div className="flex justify-center items-center h-full bg-slate-300 rounded-md">
-              <button
-                onClick={() => navigate("/admin/dashboard")}
-                className="px-5 py-2 bg-gray-800 text-white rounded-md my-4 hover:bg-gray-900 transition-all"
-              >
-                Upload Video
-              </button>
-            </div>
-          </div>
         </div>
       </InfiniteScroll>
     </div>

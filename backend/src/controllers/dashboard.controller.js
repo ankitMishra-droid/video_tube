@@ -5,6 +5,7 @@ import { Subscription } from "../models/subscription.model.js";
 import { Like } from "../models/likes.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import User from "../models/users.model.js";
+import { videoRoutes } from "../routes/video.routes.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
   try {
@@ -94,26 +95,77 @@ const getChannelVideos = asyncHandler(async (req, res) => {
       throw new Error("user not found");
     }
 
-    const video = await Video.find({
-      owner: channelID,
-      isPublished: true,
-    }).populate(
-      "owner",
+    // const video = await Video.find({
+    //   owner: channelID,
+    //   isPublished: true,
+    // }).populate(
+    //   "owner",
+    //   {
+    //     videoFile: 1,
+    //     thumbnail: 1,
+    //     title: 1,
+    //     description: 1,
+    //     duration: 1,
+    //     createdAt: 1,
+    //     views: 1,
+    //     userName: 1,
+    //     firstName: 1,
+    //     lastName: 1,
+    //     avatar: 1
+    //   },
+    //   "User"
+    // );
+    const video = await Video.aggregate([
       {
-        videoFile: 1,
-        thumbnail: 1,
-        title: 1,
-        description: 1,
-        duration: 1,
-        createdAt: 1,
-        views: 1,
-        userName: 1,
-        firstName: 1,
-        lastName: 1,
-        avatar: 1,
+        $match: {
+          owner: user?._id
+        }
       },
-      "User"
-    );
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "video",
+          as: "likes"
+        }
+      },
+      {
+        $addFields: {
+          likesCount: {
+            $size: "$likes"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "video",
+          as: "comments"
+        }
+      },
+      {
+        $addFields: {
+          commentsCount: {
+            $size: "$comments"
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          videoRoutes: 1,
+          thumbnail: 1,
+          isPublished: 1,
+          likesCount: 1,
+          commentsCount: 1,
+          createdAt: 1,
+          description: 1,
+          title: 1,
+          views: 1,
+        }
+      }
+    ])
 
     if (!video || video.length === 0) {
       throw new Error("no videos uplaoded by the user");
@@ -130,4 +182,75 @@ const getChannelVideos = asyncHandler(async (req, res) => {
   }
 });
 
-export { getChannelStats, getChannelVideos };
+const getAllChannelVideos = asyncHandler(async (req, res) => {
+  try {
+    const video = await Video.aggregate([
+      {
+        $match: {
+          owner: req.user?._id
+        }
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "video",
+          as: "likes"
+        }
+      },
+      {
+        $addFields: {
+          likesCount: {
+            $size: "$likes"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "video",
+          as: "comments"
+        }
+      },
+      {
+        $addFields: {
+          commentsCount: {
+            $size: "$comments"
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          videoRoutes: 1,
+          thumbnail: 1,
+          isPublished: 1,
+          likesCount: 1,
+          commentsCount: 1,
+          createdAt: 1,
+          description: 1,
+          title: 1,
+          views: 1,
+        }
+      }
+    ])
+
+    if(!video){
+      throw new Error("Vidoes not found")
+    }
+
+    return res.status(200).json(
+      new ApiResponse(201, "Videos fetched", video)
+    )
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      message: error?.message || "something went wrong",
+      error: true,
+      success: false
+    })
+  }
+})
+
+export { getChannelStats, getChannelVideos, getAllChannelVideos };

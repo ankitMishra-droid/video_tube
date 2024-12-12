@@ -27,7 +27,7 @@ function App() {
   if (loading) {
     return (
       <>
-        <div className="h-screen w-full  overflow-y-auto bg-[#121212] text-white">
+        <div className="h-screen w-full  overflow-y-auto bg-[#000000] text-white">
           <div className="flex flex-col items-center justify-center mt-64">
             <span>loading...</span>
             <h1 className="text-3xl text-center mt-8 font-semibold">
@@ -57,7 +57,7 @@ function App() {
         <Header />
         <main
           className={`px-3 py-2 flex-1 transition-all delay-0 ${
-            isSidebarOpen ? "p-3 ml-64" : "ml-0 2xl:container sm:mx-auto px-2"
+            isSidebarOpen ? "p-3 ml-0 md:ml-64" : "ml-0 2xl:container sm:mx-auto px-2"
           }`}
         >
           <Outlet />
