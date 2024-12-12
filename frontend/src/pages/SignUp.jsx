@@ -10,10 +10,10 @@ const SignUp = () => {
     lastName: "",
     email: "",
     password: "",
-    avatar: "",
+    avatar: null,
   });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,16 +28,21 @@ const SignUp = () => {
 
   const handleUploadFile = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setData((preData) => ({
-        ...preData,
-        avatar: file,
-      }));
-    }
-  }
+
+    setData((preData) => ({
+      ...preData,
+      avatar: file,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if avatar is uploaded before submitting
+    if (!data.avatar) {
+      toast.error("Please upload a profile image.");
+      return; // Prevent form submission if no avatar is selected
+    }
 
     const formData = new FormData();
     formData.append("firstName", data.firstName);
@@ -47,19 +52,27 @@ const SignUp = () => {
     formData.append("avatar", data.avatar);
     formData.append("password", data.password);
 
-    const response = await fetch(fetchApi.signup.url, {
-      method: fetchApi.signup.method,
-      credentials: "include",
-      body: formData,
-    });
+    try {
+      const response = await fetch(fetchApi.signup.url, {
+        method: fetchApi.signup.method,
+        credentials: "include",
+        body: formData,
+      });
 
-    const dataRes = await response.json();
+      const dataRes = await response.json();
 
-    if (dataRes.success) {
-      toast.success(dataRes.message);
-      navigate("/login")
-    } else {
-      toast.error(dataRes.message || "something went wrong");
+      // Log the full response for better debugging
+      console.log(dataRes);
+
+      if (dataRes.data) {
+        toast.success(dataRes.message);
+        navigate("/login");
+      } else {
+        toast.error(dataRes.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      toast.error("An error occurred. Please try again.");
     }
   };
 
@@ -70,7 +83,6 @@ const SignUp = () => {
           <form
             className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
             onSubmit={handleSubmit}
-            encType="multipart/form-data"
           >
             <div className="mb-4">
               <label
@@ -156,8 +168,8 @@ const SignUp = () => {
                 id="avatar"
                 name="avatar"
                 type="file"
+                // value={data.avatar}
                 onChange={handleUploadFile}
-                placeholder="******************"
                 required
               />
               {/* <p className="text-red-500 text-xs italic">Please choose a password.</p> */}
