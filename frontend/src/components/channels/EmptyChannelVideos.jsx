@@ -16,12 +16,15 @@ const EmptyChannelVideos = () => {
         <div className="w-full max-w-sm text-center mt-8">
           <p className="mb-3 w-full">
             <span className="inline-flex rounded-full bg-black">
-              <PlayCircle className="text-white"/>
+              <PlayCircle className="text-white" />
             </span>
           </p>
           <h4>Videos uploaded</h4>
           <p>You have yet to upload video. Click to new Upload a video</p>
-          <button onClick={() => navigate("/admin/dashboard")} className="px-5 py-2 bg-gray-800 text-white rounded-md my-4 hover:bg-gray-900 transition-all">
+          <button
+            onClick={() => navigate("/admin/dashboard")}
+            className="px-5 py-2 bg-gray-800 text-white rounded-md my-4 hover:bg-gray-900 transition-all"
+          >
             New Video
           </button>
         </div>

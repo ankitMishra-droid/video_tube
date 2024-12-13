@@ -51,7 +51,6 @@ const Login = () => {
 
       const dataRes = await response.json();
 
-      console.log(dataRes.data);
       if (response.ok && dataRes.success) {
         dispatch(setUserDetails(dataRes.data.user));
         localStorage.setItem("accessToken", dataRes.data.accessToken);

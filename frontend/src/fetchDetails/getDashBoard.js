@@ -28,7 +28,6 @@ async function getChannelVideos(dispatch, userId) {
         });
     
         const resData = await response.json();
-        console.log(resData)
         if(resData.data){
             dispatch(setVideo(resData.data))
             return resData.data

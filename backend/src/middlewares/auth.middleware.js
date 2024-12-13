@@ -31,22 +31,30 @@ const verifyJWT = asyncHandler(async (req, __, next) => {
   }
 });
 
-const restrictUser = (roles = []) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(403).json({
-        message: "Please login first",
-      });
+const checkUser = asyncHandler(async (req, _, next) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
+    if (token) {
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+      if (!decodedToken) {
+        next();
+      }
+
+      const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+
+      if(!user){
+        next()
+      }
+
+      req.user = user;
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        message: "You do not have permission to access this route.",
-      });
-    }
+    next()
+  } catch (error) {
+    throw new ApiError(401, "Invalid access token", error);
+  }
+});
 
-    return next();
-  };
-};
-
-export { verifyJWT, restrictUser };
+export { verifyJWT, checkUser };

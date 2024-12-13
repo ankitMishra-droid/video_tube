@@ -348,13 +348,13 @@ const updateVideo = asyncHandler(async (req, res) => {
       throw new Error("only owner is to be accessed to update video");
     }
 
-    await video.thumbnail.public_id;
+    // await video.thumbnail.public_id;
 
-    const thumbnailPath = req.files?.thumbnail[0]?.path;
+    // const thumbnailPath = req.files?.thumbnail[0]?.path;
 
-    if (!thumbnailPath) {
-      throw new Error("Thumbnail is required");
-    }
+    // if (!thumbnailPath) {
+    //   throw new Error("Thumbnail is required");
+    // }
 
     const updatedVideo = await Video.findByIdAndUpdate(
       video,
@@ -362,10 +362,10 @@ const updateVideo = asyncHandler(async (req, res) => {
         $set: {
           title: title,
           description: description,
-          thumbnail: {
-            public_id: crypto.randomBytes(32).toString("hex"),
-            url: thumbnailPath,
-          },
+          // thumbnail: {
+          //   public_id: crypto.randomBytes(32).toString("hex"),
+          //   url: thumbnailPath,
+          // },
         },
       },
       { new: true }

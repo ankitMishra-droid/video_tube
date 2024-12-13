@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   const stats = useSelector((state) => state.dashboard.stats);
   const video = useSelector((state) => state.dashboard.videos);
-  console.log(video);
+  // console.log(video);
 
   return (
     <div>

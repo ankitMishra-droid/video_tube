@@ -52,9 +52,11 @@ const ChannelSubscribed = () => {
 
   return (
     <>
-      {subscribed?.map((profile) => (
-        <SubscriptionCards key={profile?._id} profile={profile} />
-      ))}
+    <div className="my-5">
+        {subscribed?.map((profile) => (
+          <SubscriptionCards key={profile?._id} profile={profile} />
+        ))}
+      </div>
     </>
   );
 };
