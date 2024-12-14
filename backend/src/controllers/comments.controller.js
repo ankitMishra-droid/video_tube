@@ -131,101 +131,98 @@ const deleteComment = asyncHandler(async (req, res) => {
 });
 
 const getAllComments = asyncHandler(async (req, res) => {
-  try {
-    const { videoId } = req.params;
+  const { videoId } = req.params;
+  const { page = 1, limit = 10 } = req.query;
 
-    const { page = 1, limit = 10 } = req.query;
-
-    // if (!isValidObjectId(videoId)) {
-    //   throw new Error("video id invalid");
-    // }
-
-    const video = await Video.findById(videoId);
-
-    if (!video) {
-      throw new Error("video not found");
-    }
-
-    const commentAggregate = await Comments.aggregate([
-      {
-        $match: {
-          video: new mongoose.Types.ObjectId(videoId),
-        },
-      },
-      {
-        $lookup: {
-          from: "User",
-          localField: "owner",
-          foreignField: "_id",
-          as: "owner",
-        }
-      },
-      {
-        $lookup: {
-          from: "Like",
-          localField: "_id",
-          foreignField: "comment",
-          as: "like",
-        }
-      },
-      {
-        $addFields: {
-          likeCount: {
-            $size: "$like",
-          },
-          owner: {
-            $first: "$owner",
-          },
-          isLiked: {
-            $cond: {
-              if: {
-                $in: [req.user?._id, "$like.likedBy"],
-              },
-              then: true,
-              else: false
-            }
-          },
-        },
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        }
-      },
-      {
-        $project: {
-          content: 1,
-          createdAt: 1,
-          likeCount: 1,
-          owner: {
-            userName: 1,
-            firstName: 1,
-            "avatar.url": 1,
-          },
-          isLiked: 1,
-        }
-      }
-    ]);
-
-    const options = {
-      page: parseInt(page, 10),
-      limit: parseInt(limit, 10),
-    };
-
-    const comments = await Comments.aggregatePaginate(
-      commentAggregate,
-      options
-    );
-
-    return res
-      .status(200)
-      .json(new ApiResponse(201, "all comment fetched", comments));
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      message: error?.message || "somthing went wrong",
-    });
+  if (!videoId || !isValidObjectId(videoId)) {
+      throw new ApiError(400, "No valid video Id found");
   }
-});
 
+  const getComments = await Comments.aggregate([
+      {
+          $match: {
+              video: new mongoose.Types.ObjectId(videoId),
+          },
+      },
+      {
+          $sort: {
+              createdAt: -1,
+          },
+      },
+      {
+          $skip: (page - 1) * limit,
+      },
+      {
+          $limit: parseInt(limit),
+      },
+      {
+          $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                  {
+                      $project: {
+                          username: 1,
+                          _id: 1,
+                          avatar: 1,
+                      },
+                  },
+              ],
+          },
+      },
+      {
+          $addFields: {
+              owner: {
+                  $first: "$owner",
+              },
+          },
+      },
+      {
+          $lookup: {
+              from: "likes",
+              localField: "_id",
+              foreignField: "comment",
+              as: "likes",
+          },
+      },
+      {
+          $addFields: {
+              likesCount: {
+                  $size: "$likes",
+              },
+              isLiked: {
+                  $cond: {
+                      if: { $in: [req.user?._id, "$likes.likedBy"] },
+                      then: true,
+                      else: false,
+                  },
+              },
+          },
+      },
+      {
+          $project: {
+              _id: 1,
+              username: 1,
+              avatar: 1,
+              likesCount: 1,
+              isLiked: 1,
+              content: 1,
+              owner: 1,
+              createdAt: 1,
+          },
+      },
+  ]);
+
+  if (!getComments) {
+      throw new ApiError(501, "Error while fetching comments");
+  }
+
+  return res
+      .status(200)
+      .json(
+          new ApiResponse(201, "Comments fetched successfully", getComments)
+      );
+});
 export { addComment, updateComment, deleteComment, getAllComments };

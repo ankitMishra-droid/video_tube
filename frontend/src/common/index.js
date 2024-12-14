@@ -56,6 +56,14 @@ const fetchApi = {
         url: `${backendDomain}/api/dashboard`,
         method: "GET"
     },
+    toggleLike: {
+        url: `${backendDomain}/api/like`,
+        method: "POST"
+    },
+    commentsOnVideo: {
+        url: `${backendDomain}/api/comment`,
+        method: "GET"
+    }
 }
 
 export default fetchApi

@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import loadingImg from "@/assets/loader.gif";
 import VideoPlayer from '@/components/video/VideoPlayer'
+import VideoInfo from '@/components/video/videoInfo'
+import Comment from '@/components/Comment'
 
 const Video = () => {
     const { videoTitle, videoId } = useParams()
@@ -29,7 +31,6 @@ const Video = () => {
 
         const resData = await response.json();
 
-        console.log(resData)
         if(resData.data){
           dispatch(setVideo(resData.data))
         }
@@ -57,9 +58,15 @@ const Video = () => {
             <img src={loadingImg} className='w-20 h-20' alt='loadngImg'/>
           </div>
         ) : (
-          <div className='flex'>
-            <div className='w-full border rounded-md border-black 2xl:w-[70%] p-1'>
+          <div className='flex flex-col 2xl:w-[70%]'>
+            <div className='w-full border rounded-md border-black p-1'>
               <VideoPlayer key={video?.[0]?._id} videoFile={video?.[0]?.videoFile}/>
+            </div>
+            <div>
+              <VideoInfo video={video}/>
+            </div>
+            <div>
+              <Comment video={video}/>
             </div>
           </div>
         )
