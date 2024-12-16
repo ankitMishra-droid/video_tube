@@ -20,7 +20,7 @@ const VideoPlaylist = () => {
   const playlists = useSelector((state) => state.user.userPlaylist);
 
   useEffect(() => {
-    getUserPlayList(dispatch, user?._id || userData._id).then(() =>
+    getUserPlayList(dispatch, user?._id || userData?._id).then(() =>
       setLoading(false)
     );
   }, [userName]);
@@ -56,10 +56,10 @@ const VideoPlaylist = () => {
                 counter++;
                 return (
                   <li
-                    key={playlist._id}
+                    key={playlist?._id}
                     className="hover:bg-zinc-900 2xl:w-[18vw] md:w-[25vw] w-[90vw] text-white rounded-md my-4 mx-2 p-1"
                   >
-                    <Link to={`/playlist/${playlist._id}`}>
+                    <Link to={`/playlist/${playlist?._id}`}>
                       <div className="relative">
                         <img
                           src={playlistImg}
