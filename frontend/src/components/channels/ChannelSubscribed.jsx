@@ -7,6 +7,7 @@ import SubscriptionCards from "../subscription/SubscriptionCards";
 
 const ChannelSubscribed = () => {
   const user = useSelector((state) => state?.user?.user);
+  const status = useSelector((state) => state.auth.status)
   const dispatch = useDispatch();
 
   const [filter, setFilter] = useState(null);
@@ -46,7 +47,7 @@ const ChannelSubscribed = () => {
     }
   }
 
-  return data?.channelsCount > 0 ? (
+  return data?.channelsCount > 0 && status ? (
     <>
       <div className="my-5">
         {subscribed?.map((profile) => (
@@ -57,7 +58,6 @@ const ChannelSubscribed = () => {
   ) : (
     <>
       <ChannelEmptySubscriber />
-      {data?.channelsCount}
     </>
   );
 };

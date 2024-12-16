@@ -1,7 +1,7 @@
 import { PlayCircle } from "lucide-react";
 import React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 
 const EmptyChannelVideos = () => {
@@ -33,10 +33,11 @@ const EmptyChannelVideos = () => {
   } else {
     return (
       <div className="flex flex-col justify-center items-center my-10">
-        <h5>No videos uploaded</h5>
-        <p>
-          This page has yet to upload a video. Search another page in order to
-          find more videos.
+        <h5>Please login first</h5>
+        <p className="py-1 text-blue-600 hover:text-blue-900 hover:underline">
+          <Link  to={"/login"}>
+            Login
+          </Link>
         </p>
       </div>
     );

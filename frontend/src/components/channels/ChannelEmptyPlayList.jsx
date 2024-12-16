@@ -50,7 +50,7 @@ const ChannelEmptyPlayList = ({ videos = false }) => {
   } else {
     return (
       <div className="flex justify-center mt-4">
-        <div className="max-w-sm w-full text-center mt-6">
+        {/* <div className="max-w-sm w-full text-center mt-6">
           <p className="mb-3 w-full inline-flex">
             <span>
               <FolderOpen className="w-6 h-6" />
@@ -63,6 +63,12 @@ const ChannelEmptyPlayList = ({ videos = false }) => {
             {videos
               ? "This playlist has no videos"
               : "there are no playlist created on this channel"}
+          </p>
+        </div> */}
+        <div className="flex flex-col justify-center items-center my-10">
+          <h5>Please login first</h5>
+          <p className="py-1 text-blue-600 hover:text-blue-900 hover:underline">
+            <Link to={"/login"}>Login</Link>
           </p>
         </div>
       </div>
