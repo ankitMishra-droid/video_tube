@@ -3,7 +3,7 @@ import { setVideo } from "@/features/videoSlice";
 import getTimeDistance from "@/helpers/getTimeDistance";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import {
@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Copy, Ellipsis, EllipsisVertical } from "lucide-react";
+import { Copy, Ellipsis, EllipsisVertical, ThumbsUp } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
@@ -25,15 +25,16 @@ const VideoInfo = ({ video }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const selectLink = useRef(null);
-  const [showFullDescription, setShowFullDescription] = useState(false)
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const navigate = useNavigate();
+  const { videoId } = useParams();
 
   const toggleDescription = () => {
-    setShowFullDescription(prev => !prev)
-  }
+    setShowFullDescription((prev) => !prev);
+  };
 
   function copyToClipboard(e) {
-    selectLink.current.select();
-    document.execCommand("copy");
+    navigator.clipboard.writeText(selectLink.current.value);
 
     e.target.focus();
     toast.success("Copied!", {
@@ -43,15 +44,12 @@ const VideoInfo = ({ video }) => {
 
   const toggleLike = async (e) => {
     if (!status) {
-      return (
-        <div>
-          <Link to={"/login"}>Login</Link>
-        </div>
-      );
+      navigate("/login");
+      return;
     } else {
       try {
         const response = await fetch(
-          `${fetchApi.toggleLike.url}/toggle/v/${video?._id}`,
+          `${fetchApi.toggleLike.url}/toggle/v/${videoId}`,
           {
             method: fetchApi.toggleLike.method,
             credentials: "include",
@@ -59,14 +57,15 @@ const VideoInfo = ({ video }) => {
         );
 
         const resData = await response.json();
+        console.log(resData?.data);
         if (resData.data) {
           dispatch(
             setVideo({
               ...video,
               isLiked: !video.isLiked,
-              likesCount: video.isLiked
-                ? video.likesCount - 1
-                : video.likesCount + 1,
+              likeCount: video.isLiked
+                ? video.likeCount - 1
+                : video.likeCount + 1,
             })
           );
         }
@@ -76,6 +75,7 @@ const VideoInfo = ({ video }) => {
       }
     }
   };
+
   return (
     <div>
       <div className="w-full">
@@ -124,19 +124,60 @@ const VideoInfo = ({ video }) => {
           </div>
           <div className="flex justify-between items-center mt-3">
             <div className="flex gap-3 items-center">
-              <Link to={`/channel/${user?.userName}`} className="inline-block">
-                <img src={user?.avatar} className="w-10 h-10 my-2" />
+              <Link
+                to={`/channel/${video?.[0]?.owner?.userName}`}
+                className="inline-block"
+              >
+                <img
+                  src={video?.[0]?.owner?.avatar}
+                  className="w-10 h-10 my-2"
+                />
               </Link>
               <div>
                 <p className="text-lg font-semibold -mb-2">
-                  {user?.firstName} {user?.lastName}
+                  {video?.[0]?.owner?.firstName} {video?.[0]?.owner?.lastName}
                 </p>
-                <Link to={`/channel/${user?.userName}`} className="text-sm">
-                  @{user?.userName}
+                <Link
+                  to={`/channel/${video?.[0]?.owner?.userName}`}
+                  className="text-sm"
+                >
+                  @{video?.[0]?.owner?.userName}
                 </Link>
               </div>
             </div>
-            <div>{<Button>Subscribe</Button>}</div>
+            <div className="flex items-center gap-4">
+              <div>
+                <button
+                  className="bg-[#212121] hover:bg-[#111] text-white rounded-lg transition-all px-3 py-2"
+                  onClick={toggleLike}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {video?.[0]?.isLiked ? (
+                      <>
+                        <ThumbsUp fill="white" />
+                        <p>
+                          {video?.[0]?.likeCount > 0
+                            ? video?.[0]?.likeCount
+                            : "Like"}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <ThumbsUp />
+                        <p>
+                          {video?.[0]?.likeCount > 0
+                            ? video?.[0]?.likeCount
+                            : "Like"}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
+              <div>
+                <Button>Subscribe</Button>
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex justify-between">
@@ -145,13 +186,15 @@ const VideoInfo = ({ video }) => {
           </h4>
         </div>
         <div className="mt-5 flex justify-between items-center">
-          <p className={`font-semibold my-1 text-base ${showFullDescription ? "" : "line-clamp-1"}`}>
+          <p
+            className={`font-semibold my-1 text-base ${
+              showFullDescription ? "" : "line-clamp-1"
+            }`}
+          >
             {video?.[0].description ? video?.[0].description : "No description"}
           </p>
           <button onClick={toggleDescription}>
-            {
-              showFullDescription && <Ellipsis />
-            }
+            {showFullDescription && <Ellipsis />}
           </button>
         </div>
       </div>

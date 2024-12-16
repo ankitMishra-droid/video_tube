@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Like } from "../models/likes.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
   try {
@@ -17,21 +18,25 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     });
 
     if (existedLike) {
-      await Like.findByIdAndDelete(existedLike?._id);
+      const removeLike = await Like.findByIdAndDelete(existedLike?._id);
 
-      return res
-        .status(200)
-        .json(new ApiResponse(201, "dislike", { isLiked: false }));
+      if(!removeLike){
+        throw new ApiError(401, "error while remove like")
+      }
     }
 
-    await Like.create({
+    const liked = await Like.create({
       video: videoId,
       likedBy: req.user?._id,
     });
 
+    if(!liked){
+      throw new ApiError(500, "error while like toggle")
+    }
+
     return res
       .status(200)
-      .json(new ApiResponse(201, "liked", { isLiked: true }));
+      .json(new ApiResponse(201, "liked status changed", {}));
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -56,21 +61,24 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     });
 
     if (existedLike) {
-      await Like.findByIdAndDelete(existedLike?._id);
+      const removeLike = await Like.findByIdAndDelete(existedLike?._id);
 
-      return res
-        .status(200)
-        .json(new ApiResponse(201, "disliked", { isLiked: false }));
+      if(!removeLike){
+        throw new ApiError(500, "error while undo like")
+      }
     }
 
-    await Like.create({
+    const liked = await Like.create({
       comment: commentId,
       likedBy: req.user?._id,
     });
 
+    if(!liked){
+      throw new ApiError(500, "error while like on comment")
+    }
     return res
       .status(200)
-      .json(new ApiResponse(201, "liked", { isLiked: true }));
+      .json(new ApiResponse(201, "liked", {}));
   } catch (error) {
     console.log(error);
     return res.status(500).json({

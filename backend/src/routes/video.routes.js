@@ -18,6 +18,6 @@ videoRoutes.route("/").post(verifyJWT, upload.fields([
 
 videoRoutes.route("/c/:userId").get(verifyJWT, getUserVideo)
 
-videoRoutes.route("/:videoId").get(getVideoById).delete(verifyJWT, deleteVideos).patch(verifyJWT, updateVideo).put(verifyJWT, togglePublish)
+videoRoutes.route("/:videoId").get(checkUser, getVideoById).delete(verifyJWT, deleteVideos).patch(verifyJWT, updateVideo).put(verifyJWT, togglePublish)
 
 export { videoRoutes }

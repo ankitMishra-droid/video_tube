@@ -57,7 +57,7 @@ const router = createBrowserRouter([
             element: <About />
           },
           {
-            path: "/channel/:userName//subscribed",
+            path: "/channel/:userName/subscribed",
             element: <ChannelSubscribed />
           }
         ]

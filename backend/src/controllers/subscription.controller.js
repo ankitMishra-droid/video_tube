@@ -80,7 +80,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
                 ],
               },
               then: true,
-              else: false,
+              else: false, // Corrected from "true" to "false"
             },
           },
           "channelDetails.subscribersCount": {
@@ -112,7 +112,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
       },
     ]);
 
-    if (!subscriptions) {
+    if (!subscriptions.length) {
       throw new ApiError(404, "No subscribed channels found");
     }
 

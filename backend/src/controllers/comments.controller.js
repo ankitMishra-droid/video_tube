@@ -164,7 +164,7 @@ const getAllComments = asyncHandler(async (req, res) => {
               pipeline: [
                   {
                       $project: {
-                          username: 1,
+                          userName: 1,
                           _id: 1,
                           avatar: 1,
                       },

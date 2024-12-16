@@ -6,7 +6,7 @@ import crypto from "crypto";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
@@ -24,8 +24,14 @@ const publishVideo = asyncHandler(async (req, res) => {
     const videoFilePath = req.files.videoFile[0].path;
     const thumbnailFilePath = req.files.thumbnail[0].path;
 
-    const videoFile = await uploadOnCloudinary(videoFilePath, "videos from users");
-    const thumbnailFile = await uploadOnCloudinary(thumbnailFilePath, "thumbnail");
+    const videoFile = await uploadOnCloudinary(
+      videoFilePath,
+      "videos from users"
+    );
+    const thumbnailFile = await uploadOnCloudinary(
+      thumbnailFilePath,
+      "thumbnail"
+    );
 
     if (!videoFile || !thumbnailFile) {
       throw new ApiError(500, "File upload failed");
@@ -48,8 +54,9 @@ const publishVideo = asyncHandler(async (req, res) => {
     }
 
     // Respond with success
-    return res.status(201).json(new ApiResponse(201, "Video uploaded", uploadedVideo));
-
+    return res
+      .status(201)
+      .json(new ApiResponse(201, "Video uploaded", uploadedVideo));
   } catch (error) {
     console.log(error);
     return res.status(500).json(new ApiError(500, "Something went wrong"));
@@ -70,18 +77,24 @@ const getAllVideos = asyncHandler(async (req, res) => {
     // Validate sortBy field
     const validSortByFields = ["createdAt", "duration", "views"];
     if (!validSortByFields.includes(sortBy)) {
-      throw new ApiError(400, "Invalid 'sortBy' field. Valid options are: createdAt, duration, views.");
+      throw new ApiError(
+        400,
+        "Invalid 'sortBy' field. Valid options are: createdAt, duration, views."
+      );
     }
 
     // Validate sortType
     const validSortTypes = ["asc", "desc"];
     if (!validSortTypes.includes(sortType)) {
-      throw new ApiError(400, "Invalid 'sortType'. Valid options are: asc, desc.");
+      throw new ApiError(
+        400,
+        "Invalid 'sortType'. Valid options are: asc, desc."
+      );
     }
 
     // Create the aggregation pipeline
     const matchConditions = {
-      isPublished: true,  // Always filter for published videos
+      isPublished: true, // Always filter for published videos
     };
 
     // If a search query is provided, include it in the match condition
@@ -99,7 +112,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $lookup: {
-          from: "users",  // Ensure the collection name is correct (should be "users" not "User")
+          from: "users", // Ensure the collection name is correct (should be "users" not "User")
           localField: "owner",
           foreignField: "_id",
           as: "owner",
@@ -117,7 +130,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $addFields: {
-          owner: { $first: "$owner" },  // Get the first matched owner
+          owner: { $first: "$owner" }, // Get the first matched owner
         },
       },
       {
@@ -136,14 +149,14 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $sort: {
-          [sortBy]: sortType === "desc" ? -1 : 1,  // Sorting by the selected field and type
+          [sortBy]: sortType === "desc" ? -1 : 1, // Sorting by the selected field and type
         },
       },
       {
-        $skip: (page - 1) * parseInt(limit),  // Skip for pagination
+        $skip: (page - 1) * parseInt(limit), // Skip for pagination
       },
       {
-        $limit: parseInt(limit),  // Limit the number of results per page
+        $limit: parseInt(limit), // Limit the number of results per page
       },
     ]);
 
@@ -153,10 +166,19 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
 
     // Return the videos in the response
-    return res.status(200).json(new ApiResponse(200, "Videos fetched successfully.", videos));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Videos fetched successfully.", videos));
   } catch (error) {
     console.error(error);
-    return res.status(error.statusCode || 500).json(new ApiError(error.statusCode || 500, error.message || "Something went wrong"));
+    return res
+      .status(error.statusCode || 500)
+      .json(
+        new ApiError(
+          error.statusCode || 500,
+          error.message || "Something went wrong"
+        )
+      );
   }
 });
 
@@ -181,22 +203,38 @@ const getVideoById = asyncHandler(async (req, res) => {
       },
       {
         $lookup: {
-          from: "like",
+          from: "likes",
           localField: "_id",
           foreignField: "video",
           as: "likes",
         },
       },
       {
+        $addFields: {
+          likeCount: {
+            $size: "$likes",
+          },
+          isLiked: {
+            $cond: {
+              if: {
+                $in: [req.user?._id, "$likes.likedBy"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
         $lookup: {
-          from: "User",
+          from: "users",
           localField: "owner",
           foreignField: "_id",
           as: "owner",
           pipeline: [
             {
               $lookup: {
-                from: "Subscription",
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
                 as: "subscribers",
@@ -221,9 +259,11 @@ const getVideoById = asyncHandler(async (req, res) => {
             {
               $project: {
                 userName: 1,
-                "avatar.url": 1,
+                avatar: 1,
                 subscriberCount: 1,
                 isSubscribed: 1,
+                firstName: 1,
+                lastName: 1,
               },
             },
           ],
@@ -231,20 +271,8 @@ const getVideoById = asyncHandler(async (req, res) => {
       },
       {
         $addFields: {
-          likeCount: {
-            $size: "$likes",
-          },
           owner: {
             $first: "$owner",
-          },
-          isLiked: {
-            $cond: {
-              if: {
-                $in: [req.user?._id, "$likes.likedBy"],
-              },
-              then: true,
-              else: false,
-            },
           },
         },
       },
@@ -260,6 +288,7 @@ const getVideoById = asyncHandler(async (req, res) => {
           isLiked: 1,
           duration: 1,
           commetns: 1,
+          owner: 1,
         },
       },
     ]);

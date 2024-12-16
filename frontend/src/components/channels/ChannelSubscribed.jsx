@@ -17,7 +17,7 @@ const ChannelSubscribed = () => {
   useEffect(() => {
     if (user?._id) {
       getUserSubscriber(dispatch, user?._id).then(() => {
-        setFilter(data?.[0]?.channels); // Set initial filter state
+        setFilter(data?.channels);
         setLoading(false);
       });
     }
@@ -31,11 +31,7 @@ const ChannelSubscribed = () => {
     );
   }
 
-  if (!data || !data[0]?.channelsCount) {
-    return <ChannelEmptySubscriber />;
-  }
-
-  const subscribed = filter || data?.[0]?.channels;
+  const subscribed = filter || data?.channels;
 
   function handleInput(input) {
     if (!input || input === "") {
@@ -50,13 +46,18 @@ const ChannelSubscribed = () => {
     }
   }
 
-  return (
+  return data?.channelsCount > 0 ? (
     <>
-    <div className="my-5">
+      <div className="my-5">
         {subscribed?.map((profile) => (
           <SubscriptionCards key={profile?._id} profile={profile} />
         ))}
       </div>
+    </>
+  ) : (
+    <>
+      <ChannelEmptySubscriber />
+      {data?.channelsCount}
     </>
   );
 };

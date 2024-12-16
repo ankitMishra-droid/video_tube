@@ -56,6 +56,7 @@ const SubscriptionCards = ({ profile }) => {
       }
     }
   };
+
   return (
     <li key={profile._id} className="flex justify-between my-2">
       <div className="flex items-center gap-x-3">
