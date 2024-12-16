@@ -15,6 +15,7 @@ const Comment = ({ video }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const status = useSelector((state) => state.auth.status);
+  const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const [data, setData] = useState({
     content: "",
@@ -158,7 +159,7 @@ useEffect(() => {
                     <p>{getTimeDistance(comment?.createdAt)}</p>
                   </div>
                 </div>
-                {status && (
+                {status || user?._id && (
                 <div className="relative">
                   <button onClick={() => handleShowOptions(comment?._id)}>
                     <EllipsisVertical />
