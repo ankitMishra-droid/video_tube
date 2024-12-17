@@ -20,9 +20,7 @@ const UploadVideoModal = ({ isOpen, onClose, updating, video }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         className="sm:max-w-md"
-        onInteractOutside={(e) => {
-          e.preventDefault();
-        }}
+        onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>
@@ -41,7 +39,7 @@ const UploadVideoModal = ({ isOpen, onClose, updating, video }) => {
               : `Uploading ${video?.title}`}
           </h6>
 
-          <p className="text-sm ms-4">
+          <p className="text-sm mx-6">
             {videoSize > 0 ? `${videoSize} MB` : "No file selected"}
           </p>
 
