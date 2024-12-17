@@ -74,7 +74,7 @@ const Video = () => {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 justify-between">
-          <div className="flex flex-col 2xl:w-[70%]">
+          <div className="flex flex-col lg:w-[60%]">
             <div className="w-full border rounded-md border-black p-1">
               <VideoPlayer
                 key={video?.[0]?._id}
@@ -88,7 +88,7 @@ const Video = () => {
               <Comment video={video} />
             </div>
           </div>
-          <div>
+          <div className="lg:w-[40%]">
             {
               videos?.filter((video) => video?._id !== videoId)
               .map((video) => (

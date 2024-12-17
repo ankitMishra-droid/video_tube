@@ -27,7 +27,7 @@ const VideoListCard = ({ video }) => {
               <img
                 src={video?.thumbnail}
                 alt={video?.title}
-                className="object-cover rounded-xl w-full h-full sm:w-[40vw] sm:h-[25vw] lg:w-[16vw] lg:h-[10vw]"
+                className="object-cover rounded-xl w-full h-full sm:w-[40vw] sm:h-[25vw] lg:w-[15vw] lg:h-[11vw]"
               />
               <p className="absolute bottom-1 right-3 bg-gray-950/75 px-1 rounded text-sm text-white">
                 {videoLength}
