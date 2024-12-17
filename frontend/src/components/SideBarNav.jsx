@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { removeUserDetails } from "@/features/authSlice";
 
 const SideBarNav = ({ setIsSidebarIsOpen }) => {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
 
   const authStatus = useSelector((state) => state?.auth?.status);
   const userData = useSelector((state) => state?.auth?.user);

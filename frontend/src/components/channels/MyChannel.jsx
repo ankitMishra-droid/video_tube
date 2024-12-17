@@ -44,7 +44,7 @@ const ProfileHeader = ({ profile, user, status, navigate, toggleSubscribe }) => 
           </Button>
         )
       ) : (
-        <Button onClick={() => navigate("/")}>Login</Button>
+        <Button onClick={() => navigate("/login")}>Login</Button>
       )}
     </div>
   </div>

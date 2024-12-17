@@ -19,7 +19,10 @@ const Header = () => {
   return (
     <nav className="w-full bg-gray-700 py-6">
       <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2 px-2">
-        <Link to={"/"} className="hidden md:inline-block md:pl-7 pl-0 pr-3 md:pr-0">
+        <Link
+          to={"/"}
+          className="hidden md:inline-block md:pl-7 pl-0 pr-3 md:pr-0"
+        >
           <Logo className={""} width={110} height={110} />
         </Link>
         <div className="pl-9 md:pl-0">
@@ -35,15 +38,19 @@ const Header = () => {
 
         {authStatus && user && (
           <div className="flex gap-3 items-center">
-            <Link to={`/channel/${user.userName}`} className="flex">
-              {/* <img
-                src={user.avatar}
-                alt={user.firstName}
-                className="object-cover h-14 w-14 shrink-0 rounded-full"
-              /> */}
-              <p className="text-white">
-                <User2 />
-              </p>
+            <Link to={`/channel/${user.userName}`} className="flex items-center gap-2">
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.firstName}
+                  className="object-cover h-10 w-10 shrink-0 rounded-full"
+                />
+              ) : (
+                <p className="text-white">
+                  <User2 />
+                </p>
+              )}
+
               <p className="text-white">{user.firstName}</p>
             </Link>
           </div>

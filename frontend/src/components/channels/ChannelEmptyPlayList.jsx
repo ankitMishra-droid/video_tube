@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import PlaylistForm from "../playlist/PlaylistForm";
+import { Link } from "react-router-dom";
 
 const ChannelEmptyPlayList = ({ videos = false }) => {
   const status = useSelector((state) => state.auth.status);

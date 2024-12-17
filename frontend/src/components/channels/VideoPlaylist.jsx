@@ -40,7 +40,7 @@ const VideoPlaylist = () => {
   let counter = 0;
   return (
     <div>
-      {playlists.length > 0 ? (
+      {playlists?.length > 0 ? (
         <div>
           {status && userData?.userName === userName && (
             <div className="flex justify-center items-center my-5">

@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import loader from "@/assets/loader.gif";
 import { Eye, GlobeIcon, InfoIcon, LucideSubscript, Mail, MessageCircle, SubscriptIcon, ThumbsUp, Video } from "lucide-react";
+import formatDate from "@/helpers/formatDate";
 
 const About = () => {
   const { userName } = useParams();
@@ -83,7 +84,7 @@ const About = () => {
         </div>
         <div className="flex items-center mb-1 gap-2">
           <InfoIcon />
-          Joined on{" "}<span>{user?.createdAt}</span>
+          Joined on{" "}<span>{formatDate(user?.createdAt)}</span>
         </div>
       </div>
     );
