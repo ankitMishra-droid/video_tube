@@ -122,19 +122,19 @@ const VideoInfo = ({ video }) => {
               </Dialog>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-3">
-            <div className="flex gap-3 items-center">
+          <div className="flex justify-between items-center mt-3 gap-2">
+            <div className="flex gap-2 sm:gap-3 items-center">
               <Link
                 to={`/channel/${video?.[0]?.owner?.userName}`}
                 className="inline-block"
               >
                 <img
                   src={video?.[0]?.owner?.avatar}
-                  className="w-10 h-10 my-2"
+                  className="w-5 h-5 sm:w-10 sm:h-10 my-2"
                 />
               </Link>
               <div>
-                <p className="text-lg font-semibold -mb-2">
+                <p className="text-base sm:text-lg font-medium sm:font-semibold -mb-1 sm:-mb-2">
                   {video?.[0]?.owner?.firstName} {video?.[0]?.owner?.lastName}
                 </p>
                 <Link
@@ -145,7 +145,7 @@ const VideoInfo = ({ video }) => {
                 </Link>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div>
                 <button
                   className="bg-[#212121] hover:bg-[#111] text-white rounded-lg transition-all px-3 py-2"
@@ -163,7 +163,7 @@ const VideoInfo = ({ video }) => {
                       </>
                     ) : (
                       <>
-                        <ThumbsUp />
+                        <ThumbsUp className="w-4 h-4 sm:w-full sm:h-full"/>
                         <p>
                           {video?.[0]?.likeCount > 0
                             ? video?.[0]?.likeCount

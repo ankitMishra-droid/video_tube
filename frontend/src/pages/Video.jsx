@@ -1,78 +1,105 @@
-import fetchApi from '@/common'
-import GuestComponent from '@/components/guest/GuestComponent'
-import { setVideo } from '@/features/videoSlice'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import fetchApi from "@/common";
+import GuestComponent from "@/components/guest/GuestComponent";
+import { setVideo } from "@/features/videoSlice";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import loadingImg from "@/assets/loader.gif";
-import VideoPlayer from '@/components/video/VideoPlayer'
-import VideoInfo from '@/components/video/videoInfo'
-import Comment from '@/components/Comment'
+import VideoPlayer from "@/components/video/VideoPlayer";
+import VideoInfo from "@/components/video/videoInfo";
+import Comment from "@/components/Comment";
+import VideoListCard from "@/components/video/VideoListCard";
 
 const Video = () => {
-    const { videoTitle, videoId } = useParams()
-    const [loading, setLoading] = useState(true)
-    const video = useSelector((state) => state.video.video);
-    const dispatch = useDispatch();
-    const [error, setError] = useState("")
-    const [videos, setVideos] = useState([])
-    const status = useSelector(state => state.auth.status)
+  const { videoTitle, videoId } = useParams();
+  const [loading, setLoading] = useState(true);
+  const video = useSelector((state) => state.video.video);
+  const dispatch = useDispatch();
+  const [error, setError] = useState("");
+  const [videos, setVideos] = useState([]);
+  const status = useSelector((state) => state.auth.status);
 
-    const fetchVideo = async() => {
-      setError("")
-      try {
-        const response = await fetch(`${fetchApi.getAllVideos.url}/${videoId}`, {
-          method: fetchApi.getAllVideos.method,
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+  const fetchVideo = async () => {
+    setError("");
+    try {
+      const response = await fetch(`${fetchApi.getAllVideos.url}/${videoId}`, {
+        method: fetchApi.getAllVideos.method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        const resData = await response.json();
+      const resData = await response.json();
 
-        if(resData.data){
-          dispatch(setVideo(resData.data))
-        }
-      } catch (error) {
-        setError(
-          <GuestComponent 
-            title="Video dosen't exist."
-            subtitle="User may be deleted or moved."
-          />
-        )
-      } finally{
-        setLoading(false)
+      if (resData.data) {
+        dispatch(setVideo(resData.data));
       }
+    } catch (error) {
+      setError(
+        <GuestComponent
+          title="Video dosen't exist."
+          subtitle="User may be deleted or moved."
+        />
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
-    useEffect(() => {
-      fetchVideo()
-    }, [videoId, videoTitle, status])
+  const fetchRelatedVideo = async() => {
+    try {
+      const response = await fetch(`${fetchApi.getAllVideos.url}?sortBy=views&limit=15`, {
+        method: "GET"
+      })
+
+      const dataRes = await response.json();
+      if(dataRes?.data){
+        setVideos(dataRes?.data)
+      }
+    } catch (error) {
+      console.log('error while fetching related videos, ', error)
+    }
+  }
+  useEffect(() => {
+    fetchVideo();
+    fetchRelatedVideo()
+  }, [videoId, videoTitle, status]);
 
   return (
     <div>
-      {
-        loading ? (
-          <div className='flex justify-center my-10'>
-            <img src={loadingImg} className='w-20 h-20' alt='loadngImg'/>
-          </div>
-        ) : (
-          <div className='flex flex-col 2xl:w-[70%]'>
-            <div className='w-full border rounded-md border-black p-1'>
-              <VideoPlayer key={video?.[0]?._id} videoFile={video?.[0]?.videoFile}/>
+      {loading ? (
+        <div className="flex justify-center my-10">
+          <img src={loadingImg} className="w-20 h-20" alt="loadngImg" />
+        </div>
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-6 justify-between">
+          <div className="flex flex-col 2xl:w-[70%]">
+            <div className="w-full border rounded-md border-black p-1">
+              <VideoPlayer
+                key={video?.[0]?._id}
+                videoFile={video?.[0]?.videoFile}
+              />
             </div>
             <div>
-              <VideoInfo video={video}/>
+              <VideoInfo video={video} />
             </div>
             <div>
-              <Comment video={video}/>
+              <Comment video={video} />
             </div>
           </div>
-        )
-      }
+          <div>
+            {
+              videos?.filter((video) => video?._id !== videoId)
+              .map((video) => (
+                <VideoListCard key={video?._id} video={video}/>
+              ))
+            }
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Video
+export default Video;

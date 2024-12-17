@@ -56,7 +56,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
 
   return (
     <>
-      <div className="absolute top-[29px] left-1">
+      <div className="absolute top-[29px] left-1 z-50">
         <div className="text-left">
           <button
             className="text-white"
@@ -97,7 +97,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="/"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <Home />
                   <span className="ms-3">Home</span>
@@ -106,7 +106,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <MessageCircle />
                   <span className="flex-1 ms-3 whitespace-nowrap">Tweets</span>
@@ -116,7 +116,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <ThumbsUp />
                   <span className="flex-1 ms-3 whitespace-nowrap">
@@ -127,7 +127,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <History />
                   <span className="flex-1 ms-3 whitespace-nowrap">History</span>
@@ -136,7 +136,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <Play />
                   <span className="flex-1 ms-3 whitespace-nowrap">Videos</span>
@@ -146,7 +146,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                 {authStatus && (
                   <Link
                     to={`/admin/dashboard`}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                   >
                     <LayoutDashboard />
                     <span className="flex-1 ms-3 whitespace-nowrap">
@@ -158,7 +158,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                 >
                   <VideoIcon />
                   <span className="flex-1 ms-3 whitespace-nowrap">
@@ -169,15 +169,15 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
             </ul>
           </div>
           {authStatus && (
-            <div className="absolute bottom-0 py-4">
+            <div className="absolute bottom-0 py-4 w-full left-0 right-0 overflow-hidden">
               <ul className="space-y-2 font-medium w-full">
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                    className="w-full flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                   >
                     <LogOut />
-                    <span className="flex-1 ms-3 whitespace-nowrap">
+                    <span className="ms-3 whitespace-nowrap">
                       Logout
                     </span>
                   </button>
@@ -185,7 +185,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                 <li>
                   <Link
                     to={"/settings"}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                    className="flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                   >
                     <Settings />
                     <span className="flex-1 ms-3 whitespace-nowrap">

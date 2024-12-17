@@ -11,7 +11,7 @@ import SideBarNav from "./components/SideBarNav";
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     healthCheck().then(() => {

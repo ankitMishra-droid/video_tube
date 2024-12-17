@@ -2,7 +2,12 @@ import fetchApi from "@/common";
 import formatDate from "@/helpers/formatDate";
 import formatDuration from "@/helpers/formatDuration";
 import getTimeDistance from "@/helpers/getTimeDistance";
-import { DeleteIcon, EllipsisVertical, PencilIcon, ThumbsUp, TrashIcon } from "lucide-react";
+import {
+  EllipsisVertical,
+  PencilIcon,
+  ThumbsUp,
+  TrashIcon,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Input } from "./ui/input";
@@ -17,6 +22,9 @@ const Comment = ({ video }) => {
   const status = useSelector((state) => state.auth.status);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+  const [showComments, setShowComments] = useState(
+    window.innerWidth > 1023
+  );
   const [data, setData] = useState({
     content: "",
   });
@@ -29,19 +37,21 @@ const Comment = ({ video }) => {
     }));
   };
 
+  const handleCommentShow = (e) => {
+    setShowComments((prev) => !prev);
+  };
+
   const handleShowOptions = (commentId) => {
     setActiveCommentId((prev) => (prev === commentId ? null : commentId));
   };
 
-useEffect(() => {
-    // Toggle body scroll based on activeCommentId
+  useEffect(() => {
     if (activeCommentId) {
       document.body.classList.add("no-scroll");
     } else {
       document.body.classList.remove("no-scroll");
     }
 
-    // Cleanup on component unmount
     return () => document.body.classList.remove("no-scroll");
   }, [activeCommentId]);
 
@@ -107,85 +117,121 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      setShowComments(window.innerWidth > 1023);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <div>
       <div className="mt-4">
         <h1 className="font-bold text-2xl">Comments ({comments.length})</h1>
       </div>
-      <div className="mt-3 flex items-center gap-x-4" onSubmit={addComments}>
+      <div className="mt-3 flex items-center gap-x-2 sm:gap-x-4">
         <p>
           <img
             src={video?.[0]?.owner?.avatar}
-            className="w-6 h-6"
+            className="w-6 h-6 sm:w-10 sm:h-10"
             alt="avatar_image"
           />
         </p>
-        <form className="w-full flex items-center gap-x-2">
+        <form
+          className="w-full flex items-center gap-x-2"
+          onSubmit={addComments}
+        >
           <Input
             placeholder="Add Comments"
             className="min-h-[90%]"
             name="content"
             value={data.content}
             onChange={handleChange}
+            onFocus={() => {
+              if(!status){
+                navigate("/login")
+              }
+            }}
           />
           <Button type="submit">Submit</Button>
         </form>
       </div>
-      <div className="mt-3">
-        <div className="">
-          {comments.map((comment) => (
-            <div key={comment?._id}>
-              <div className="py-3 flex items-center justify-between">
-                <div className="flex items-center w-[90%]">
-                  <Link
-                    to={`/channel/${video?.[0]?.owner?.userName}`}
-                    className="px-1"
-                  >
-                    <img
-                      src={comment?.owner.avatar}
-                      alt="avatar_image"
-                      className="w-7 h-7"
-                    />
-                  </Link>
-                  <div className="flex gap-x-1">
+
+      {window.innerWidth <= 1023 && (
+      <div className="flex justify-center py-2">
+        <button onClick={handleCommentShow}>
+          {showComments ? "Hide Comments" : "Show Comments"}
+        </button>
+      </div>
+      )}
+
+      {showComments && (
+        <div className="mt-3">
+          <div className="">
+            {comments.map((comment) => (
+              <div key={comment?._id}>
+                <div className="py-3 flex items-center justify-between">
+                  <div className="flex items-center w-[90%]">
                     <Link
                       to={`/channel/${video?.[0]?.owner?.userName}`}
-                      className="-mb-2 inline-block text-white px-2"
+                      className="px-1"
                     >
-                      <span className="bg-[#222222e0] inline-block">
-                        @{comment?.owner?.userName}
-                      </span>
+                      <img
+                        src={comment?.owner.avatar}
+                        alt="avatar_image"
+                        className="w-7 h-7"
+                      />
                     </Link>
-                    <p>{getTimeDistance(comment?.createdAt)}</p>
-                  </div>
-                </div>
-                {status || user?._id && (
-                <div className="relative">
-                  <button onClick={() => handleShowOptions(comment?._id)}>
-                    <EllipsisVertical />
-                  </button>
-                  {activeCommentId === comment?._id && (
-                    <div className={`absolute right-0 mt-2 bg-[white] rounded-lg shadow-2xl z-10 border`}>
-                      <button className="w-full px-4 py-2 flex items-center gap-2"><PencilIcon /><span>Edit</span></button>
-                      <button className="w-full px-4 py-2 flex items-center gap-2"><TrashIcon /><span>Delete</span></button>
+                    <div className="flex gap-x-1">
+                      <Link
+                        to={`/channel/${video?.[0]?.owner?.userName}`}
+                        className="-mb-2 inline-block text-white px-2"
+                      >
+                        <span className="bg-[#222222e0] inline-block">
+                          @{comment?.owner?.userName}
+                        </span>
+                      </Link>
+                      <p>{getTimeDistance(comment?.createdAt)}</p>
                     </div>
-                  )}
+                  </div>
+                  {status ||
+                    (user?._id && (
+                      <div className="relative">
+                        <button onClick={() => handleShowOptions(comment?._id)}>
+                          <EllipsisVertical />
+                        </button>
+                        {activeCommentId === comment?._id && (
+                          <div
+                            className={`absolute right-0 mt-2 bg-[white] rounded-lg shadow-2xl z-10 border`}
+                          >
+                            <button className="w-full px-4 py-2 flex items-center gap-2">
+                              <PencilIcon />
+                              <span>Edit</span>
+                            </button>
+                            <button className="w-full px-4 py-2 flex items-center gap-2">
+                              <TrashIcon />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                 </div>
-              )}
+                <div className="px-10 -mt-2">
+                  <p>{comment?.content}</p>
+                  <button className="py-2 mb-3 flex items-center gap-2">
+                    <ThumbsUp fill={comment?.isLiked ? "#121" : "none"} />
+                    <span>
+                      {comment?.likesCount > 0 ? comment?.likesCount : "Like"}
+                    </span>
+                  </button>
+                </div>
               </div>
-              <div className="px-10 -mt-2">
-                <p>{comment?.content}</p>
-                <button className="py-2 mb-3 flex items-center gap-2">
-                  <ThumbsUp fill={comment?.isLiked ? "#121" : "none"} />
-                  <span>
-                    {comment?.likesCount > 0 ? comment?.likesCount : "Like"}
-                  </span>
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -15,7 +15,7 @@ const VideoCard = ({ video, name = true }) => {
   return (
     <>
       <Link
-        to={`video/${video?.title}/${video?._id}`}
+        to={`/video/${video?.title}/${video?._id}`}
         className="bg-black rounded-xl h-full"
       >
         <div
