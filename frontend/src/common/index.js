@@ -63,6 +63,10 @@ const fetchApi = {
     commentsOnVideo: {
         url: `${backendDomain}/api/comment`,
         method: "GET"
+    },
+    watchHistory: {
+        url: `${backendDomain}/api/users/watch-history`,
+        method: "GET"
     }
 }
 

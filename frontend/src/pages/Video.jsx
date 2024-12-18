@@ -92,7 +92,7 @@ const Video = () => {
             {
               videos?.filter((video) => video?._id !== videoId)
               .map((video) => (
-                <VideoListCard key={video?._id} video={video}/>
+                <VideoListCard key={video?._id} video={video} imgSize={"w-full h-full sm:w-[40vw] sm:h-[25vw] lg:w-[15vw] lg:h-[11vw]"}/>
               ))
             }
           </div>

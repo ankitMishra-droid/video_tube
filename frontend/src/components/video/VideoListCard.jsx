@@ -3,7 +3,7 @@ import getTimeDistance from "@/helpers/getTimeDistance";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const VideoListCard = ({ video }) => {
+const VideoListCard = ({ video, description, imgSize }) => {
   const videoLength = formatDuration(parseInt(video?.duration));
   const uploadedTime = getTimeDistance(video?.createdAt);
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const VideoListCard = ({ video }) => {
               <img
                 src={video?.thumbnail}
                 alt={video?.title}
-                className="object-cover rounded-xl w-full h-full sm:w-[40vw] sm:h-[25vw] lg:w-[15vw] lg:h-[11vw]"
+                className={`object-cover rounded-xl ${imgSize}`}
               />
               <p className="absolute bottom-1 right-3 bg-gray-950/75 px-1 rounded text-sm text-white">
                 {videoLength}
@@ -56,6 +56,9 @@ const VideoListCard = ({ video }) => {
                   {video?.owner?.firstName} {video?.owner?.lastName}
                 </h2>
               </div>
+                <p className="my-2 text-lg">
+                  {description}
+                </p>
             </div>
           {/* </div> */}
         </div>

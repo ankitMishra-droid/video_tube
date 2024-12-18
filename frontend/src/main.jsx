@@ -18,6 +18,8 @@ import About from "./components/channels/About";
 import ChannelSubscribed from "./components/channels/ChannelSubscribed";
 import Dashboard from "./pages/Dashboard";
 import Video from "./pages/Video";
+import Search from "./pages/Search";
+import History from "./pages/History";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "/search",
+        element: <Search />
       },
       {
         path: "/channel/:userName",
@@ -69,6 +75,10 @@ const router = createBrowserRouter([
       {
         path: "/video/:videoTitle/:videoId",
         element: <Video />
+      },
+      {
+        path: "/history",
+        element: <History />
       },
     ],
   },
