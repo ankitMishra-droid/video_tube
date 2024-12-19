@@ -41,6 +41,14 @@ const VideoPanel = ({ channelVideos }) => {
 
   let videos = filter || channelVideos;
 
+  if(videos.length === 0){
+    return(
+      <div className="flex justify-center mt-10">
+        <p>there is no video uploaded yet.</p>
+      </div>
+    )
+  }
+
   return (
     <div>
       {/* search video */}
@@ -52,20 +60,36 @@ const VideoPanel = ({ channelVideos }) => {
         <table className="w-full min-w-[1000px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              <th className="border-collapse border-b p-4 text-center">Toggle</th>
-              <th className="border-collapse border-b p-4 text-center">Status</th>
-              <th className="border-collapse border-b p-4 text-center">Video</th>
-              <th className="border-collapse border-b p-4 text-center">Video Uploaded</th>
               <th className="border-collapse border-b p-4 text-center">
-                <div className={`relative flex items-center gap-x-2 justify-center cursor-pointer`}>
-                  Views {" "} 
+                Toggle
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                Status
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                Video
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                Video Uploaded
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                <div
+                  className={`relative flex items-center gap-x-2 justify-center cursor-pointer`}
+                >
+                  Views{" "}
                   {showDropdown ? (
-                    sortOrder === "desc" ? <ArrowUp className="w-5 h-5"/> : <ArrowDown className="w-5 h-5"/>
+                    sortOrder === "desc" ? (
+                      <ArrowUp className="w-5 h-5" />
+                    ) : (
+                      <ArrowDown className="w-5 h-5" />
+                    )
                   ) : (
                     <button className="w-5 h-5" onClick={toggleDropdown}>
-                        {
-                            sortOrder === "desc" ? <ArrowUp className="w-5 h-5"/> : <ArrowDown className="w-5 h-5"/>
-                        }
+                      {sortOrder === "desc" ? (
+                        <ArrowUp className="w-5 h-5" />
+                      ) : (
+                        <ArrowDown className="w-5 h-5" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -83,9 +107,15 @@ const VideoPanel = ({ channelVideos }) => {
                   </div>
                 )}
               </th>
-              <th className="border-collapse border-b p-4 text-center">Comments</th>
-              <th className="border-collapse border-b p-4 text-center">Likes</th>
-              <th className="border-collapse border-b p-4 text-center">Options</th>
+              <th className="border-collapse border-b p-4 text-center">
+                Comments
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                Likes
+              </th>
+              <th className="border-collapse border-b p-4 text-center">
+                Options
+              </th>
             </tr>
           </thead>
           <tbody className="p-4">
