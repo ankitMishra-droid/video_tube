@@ -126,7 +126,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $addFields: {
-          owner: { $first: "$owner" },
+          owner: { $first: "$owner" }, // Get the first matched owner
         },
       },
       {
@@ -183,11 +183,6 @@ const getVideoById = asyncHandler(async (req, res) => {
     if (!isValidObjectId(videoId)) {
       throw new ApiError(404, "invalid videoID");
     }
-
-    // const userId = req.user?._id;
-    // if (!userId) {
-    //   throw new ApiError(404, "invalid user");
-    // }
 
     const fetchVideo = await Video.aggregate([
       {
@@ -297,7 +292,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     });
 
     // store watchHistory
-    await User.findByIdAndUpdate(req.user._id, {
+    await User.findByIdAndUpdate(req.user?._id, {
       $addToSet: {
         watchHistory: videoId,
       },
