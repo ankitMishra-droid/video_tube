@@ -29,14 +29,14 @@ const VideoListCard = ({ video, description, imgSize }) => {
                 alt={video?.title}
                 className={`object-cover rounded-xl ${imgSize}`}
               />
-              <p className="absolute bottom-1 right-3 bg-gray-950/75 px-1 rounded text-sm text-white">
+              <p className="absolute bottom-5 right-3 bg-gray-950/75 px-1 rounded text-sm text-white">
                 {videoLength}
               </p>
             </div>
-            <div className="flex flex-col mt-1 mb-4 mx-3 my-3">
+            <div className="lg:w-1/3 flex flex-col mt-1 mb-4 mx-3 my-3">
               <div className="">
                 <h2
-                  className="text-lg font-semibold line-clamp-1"
+                  className="text-lg font-semibold text-wrap line-clamp-2"
                   title={video?.title}
                 >
                   {video?.title}
@@ -56,7 +56,7 @@ const VideoListCard = ({ video, description, imgSize }) => {
                   {video?.owner?.firstName} {video?.owner?.lastName}
                 </h2>
               </div>
-                <p className="my-2 text-lg">
+                <p className="my-2 text-lg line-clamp-1">
                   {description}
                 </p>
             </div>

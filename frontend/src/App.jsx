@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { healthCheck } from "./fetchDetails/healthCheck";
 import { getCurrentUser } from "./fetchDetails/getCurrentUser";
-import SideBarNav from "./components/SideBarNav";
 
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation()
 
   useEffect(() => {
     healthCheck().then(() => {
@@ -23,6 +23,14 @@ function App() {
       healthCheck();
     }, 5 * 60 * 1000);
   }, []);
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setIsSidebarOpen(true);
+    } else {
+      setIsSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   if (loading) {
     return (
@@ -51,13 +59,10 @@ function App() {
           autoClose={2000}
           hideProgressBar
         />
-        <div className="">
-          <SideBarNav setIsSidebarIsOpen={setIsSidebarOpen} />
-        </div>
-        <Header />
+        <Header setIsSidebarIsOpen={setIsSidebarOpen}/>
         <main
           className={`px-3 py-2 flex-1 transition-all delay-0 ${
-            isSidebarOpen ? "p-3 ml-0 md:ml-64" : "ml-0 2xl:container sm:mx-auto px-2"
+            location.pathname === "/" && isSidebarOpen ? "p-3 ml-0 md:ml-64" : "ml-0 px-2 sm:px-6 2xl:container sm:mx-auto 2xl:px-2"
           }`}
         >
           <Outlet />

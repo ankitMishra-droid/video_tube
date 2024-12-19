@@ -33,7 +33,7 @@ const Search = () => {
           name="search"
           value={search}
           onChange={handleSearchChange}
-          className="rounded-l-3xl px-6 pl-10 py-1 w-full border bg-transparent text-white focus:outline-none"
+          className="rounded-l-3xl px-6 pl-7 sm:pl-10 py-1 w-full border bg-transparent text-white focus:outline-none"
         />
         <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-200" />
       </div>

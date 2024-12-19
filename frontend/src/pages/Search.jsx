@@ -88,8 +88,8 @@ const Search = () => {
   return (
     <div>
       {loading ? (
-        <span className="flex items-center justify-center mt-5">
-          <img src={loadingGif} className="w-10 h-10" alt="loading-img" />
+        <span className="flex items-center justify-center mt-16">
+          <img src={loadingGif} className="w-16 h-16" alt="loading-img" />
         </span>
       ) : (
         <div>
@@ -103,7 +103,7 @@ const Search = () => {
               hasMore={moreData}
               loader={
                 <div className="flex items-center justify-center my-5">
-                  <img src={loadingGif} className="w-9 h-9" alt="loading-img" />
+                  <img src={loadingGif} className="w-12 h-12" alt="loading-img" />
                 </div>
               }
               scrollableTarget="scrollableDiv"

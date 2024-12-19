@@ -443,6 +443,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         as: "watchHistory",
         pipeline: [
           {
+            $match: { isPublished: true }
+          },
+          {
             $lookup: {
               from: "users",
               localField: "owner",
@@ -467,12 +470,16 @@ const getWatchHistory = asyncHandler(async (req, res) => {
               },
             },
           },
+          {
+            $sort: {
+              updatedAt: -1
+            }
+          },
         ],
       },
     },
   ]);
 
-  console.log(user[0].watchHistory);
   return res
     .status(200)
     .json(new ApiResponse(201, "watch history fetched.", user[0].watchHistory));

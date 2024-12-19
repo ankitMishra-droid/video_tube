@@ -7,6 +7,7 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import User from "../models/users.model.js";
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
@@ -74,7 +75,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
       userId,
     } = req.query;
 
-    // Validate sortBy field
     const validSortByFields = ["createdAt", "duration", "views"];
     if (!validSortByFields.includes(sortBy)) {
       throw new ApiError(
@@ -83,7 +83,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
       );
     }
 
-    // Validate sortType
     const validSortTypes = ["asc", "desc"];
     if (!validSortTypes.includes(sortType)) {
       throw new ApiError(
@@ -92,12 +91,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
       );
     }
 
-    // Create the aggregation pipeline
     const matchConditions = {
-      isPublished: true, // Always filter for published videos
+      isPublished: true,
     };
 
-    // If a search query is provided, include it in the match condition
     if (query) {
       matchConditions.$or = [
         { title: { $regex: query, $options: "i" } },
@@ -105,14 +102,13 @@ const getAllVideos = asyncHandler(async (req, res) => {
       ];
     }
 
-    // Aggregation pipeline to retrieve videos
     const videos = await Video.aggregate([
       {
         $match: matchConditions,
       },
       {
         $lookup: {
-          from: "users", // Ensure the collection name is correct (should be "users" not "User")
+          from: "users",
           localField: "owner",
           foreignField: "_id",
           as: "owner",
@@ -130,7 +126,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $addFields: {
-          owner: { $first: "$owner" }, // Get the first matched owner
+          owner: { $first: "$owner" },
         },
       },
       {
@@ -149,23 +145,21 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
       {
         $sort: {
-          [sortBy]: sortType === "desc" ? -1 : 1, // Sorting by the selected field and type
+          [sortBy]: sortType === "desc" ? -1 : 1,
         },
       },
       {
-        $skip: (page - 1) * parseInt(limit), // Skip for pagination
+        $skip: (page - 1) * parseInt(limit),
       },
       {
-        $limit: parseInt(limit), // Limit the number of results per page
+        $limit: parseInt(limit),
       },
     ]);
 
-    // If no videos are found, return a 404 response
     if (videos.length === 0) {
       throw new ApiError(404, "Videos not found");
     }
 
-    // Return the videos in the response
     return res
       .status(200)
       .json(new ApiResponse(200, "Videos fetched successfully.", videos));
@@ -303,7 +297,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     });
 
     // store watchHistory
-    await Video.findByIdAndUpdate(req.user?._id, {
+    await User.findByIdAndUpdate(req.user._id, {
       $addToSet: {
         watchHistory: videoId,
       },

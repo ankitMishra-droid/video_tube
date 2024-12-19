@@ -6,8 +6,9 @@ import Logo from "./Logo";
 import { Link } from "react-router-dom";
 import Search from "./Search";
 import { useSelector } from "react-redux";
+import SideBarNav from "./SideBarNav";
 
-const Header = () => {
+const Header = ({setIsSidebarIsOpen}) => {
   const authStatus = useSelector((state) => state?.auth?.status);
   const user = useSelector((state) => state?.auth?.user);
   const { theme, setTheme } = useTheme();
@@ -18,7 +19,8 @@ const Header = () => {
 
   return (
     <nav className="w-full bg-gray-700 py-6">
-      <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2 px-2">
+      <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2 px-4">
+        <SideBarNav setIsSidebarIsOpen={setIsSidebarIsOpen}/>
         <Link
           to={"/"}
           className="hidden md:inline-block md:pl-7 pl-0 pr-3 md:pr-0"
@@ -38,12 +40,12 @@ const Header = () => {
 
         {authStatus && user && (
           <div className="flex gap-3 items-center">
-            <Link to={`/channel/${user.userName}`} className="flex items-center gap-2">
+            <Link to={`/channel/${user.userName}`} className="flex flex-col sm:flex-row items-center sm:gap-2">
               {user?.avatar ? (
                 <img
                   src={user.avatar}
                   alt={user.firstName}
-                  className="object-cover h-10 w-10 shrink-0 rounded-full"
+                  className="object-cover w-7 h-7 sm:w-10 sm:h-10 shrink-0 rounded-full"
                 />
               ) : (
                 <p className="text-white">
@@ -51,7 +53,7 @@ const Header = () => {
                 </p>
               )}
 
-              <p className="text-white">{user.firstName}</p>
+              <p className="text-white hidden sm:block">{user.firstName}</p>
             </Link>
           </div>
         )}

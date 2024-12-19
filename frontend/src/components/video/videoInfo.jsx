@@ -14,7 +14,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Copy, Ellipsis, EllipsisVertical, ThumbsUp } from "lucide-react";
+import {
+  Check,
+  CheckCircle,
+  Copy,
+  Ellipsis,
+  EllipsisVertical,
+  ThumbsUp,
+} from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
@@ -73,6 +80,52 @@ const VideoInfo = ({ video }) => {
         toast.error("something went wrong");
         console.log(error);
       }
+    }
+  };
+
+  const toggleSubscribe = async (e) => {
+    e.preventDefault();
+    if (status) {
+      try {
+        const response = await fetch(
+          `${fetchApi.getUserSubscriber.url}/c/${video?.[0].owner._id}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        );
+
+        const dataRes = await response.json();
+        console.log(dataRes?.data);
+        if (dataRes?.data) {
+          const updatedOwner = {
+            ...video?.[0].owner,
+            isSubscribed: !video?.[0].owner.isSubscribed,
+            subscribersCount: video?.[0].owner.isSubscribed
+              ? video?.[0].owner.subscribersCount - 1
+              : video?.[0].owner.subscribersCount + 1,
+          };
+
+          dispatch(
+            setVideo({
+              ...video,
+              owner: updatedOwner,
+            })
+          );
+        }
+      } catch (error) {
+        toast.error("something went wrong");
+        console.log(error);
+      }
+    } else {
+      return (
+        <div className="flex items-center mt-10">
+          <p>
+            Please log in to subscribe.
+            <Link to={"/login"}>Login</Link>
+          </p>
+        </div>
+      );
     }
   };
 
@@ -163,7 +216,7 @@ const VideoInfo = ({ video }) => {
                       </>
                     ) : (
                       <>
-                        <ThumbsUp className="w-4 h-4 sm:w-full sm:h-full"/>
+                        <ThumbsUp className="w-4 h-4 sm:w-full sm:h-full" />
                         <p>
                           {video?.[0]?.likeCount > 0
                             ? video?.[0]?.likeCount
@@ -175,7 +228,32 @@ const VideoInfo = ({ video }) => {
                 </button>
               </div>
               <div>
-                <Button>Subscribe</Button>
+                {video?.[0].owner._id !== user?._id && (
+                  <Button
+                    onClick={toggleSubscribe}
+                    className={`flex h-9 items-center px-2 rounded-lg ${
+                      video?.[0].owner.isSubscribed
+                        ? "hover:bg-red-600"
+                        : "hover:bg-gray-700"
+                    } ${
+                      video?.[0].owner.isSubscribed
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-700 text-white"
+                    }`}
+                  >
+                    {video?.[0].owner.isSubscribed ? (
+                      <>
+                        Subscribed{" "}
+                        <span>
+                          {" "}
+                          <CheckCircle />{" "}
+                        </span>
+                      </>
+                    ) : (
+                      <>Subscribe</>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

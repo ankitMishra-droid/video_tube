@@ -3,6 +3,8 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Menu,
+  MenuIcon,
   MessageCircle,
   Play,
   Settings,
@@ -11,7 +13,7 @@ import {
   VideoIcon,
   X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,8 +56,21 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
     }
   };
 
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setShow(false);
+    } else {
+      setShow(true);
+    }
+  }, [location.pathname]);
   return (
     <>
+      {location.pathname !== "/" && show && (
+        <div
+          className={`fixed inset-0 sm:bg-gray-950/30 sm:bg-opacity-50 z-30`}
+          onClick={toggleShow}
+        ></div>
+      )}
       <div className="absolute top-[29px] left-1 z-50">
         <div className="text-left">
           <button
@@ -65,7 +80,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
             aria-expanded={show}
             onClick={toggleShow}
           >
-            <Sidebar />
+            <MenuIcon />
           </button>
         </div>
         <div
@@ -177,9 +192,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                     className="w-full flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                   >
                     <LogOut />
-                    <span className="ms-3 whitespace-nowrap">
-                      Logout
-                    </span>
+                    <span className="ms-3 whitespace-nowrap">Logout</span>
                   </button>
                 </li>
                 <li>
