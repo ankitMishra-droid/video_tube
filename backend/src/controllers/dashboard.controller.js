@@ -6,6 +6,7 @@ import { Like } from "../models/likes.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import User from "../models/users.model.js";
 import { videoRoutes } from "../routes/video.routes.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
   try {
@@ -83,73 +84,41 @@ const getChannelStats = asyncHandler(async (req, res) => {
 
 const getChannelVideos = asyncHandler(async (req, res) => {
   try {
-    const { channelID } = req.params;
-
-    if (!isValidObjectId(channelID)) {
-      throw new Error("invalid channel id");
-    }
-
-    const user = await User.findById(channelID);
-
-    if (!user) {
-      throw new Error("user not found");
-    }
-
-    // const video = await Video.find({
-    //   owner: channelID,
-    //   isPublished: true,
-    // }).populate(
-    //   "owner",
-    //   {
-    //     videoFile: 1,
-    //     thumbnail: 1,
-    //     title: 1,
-    //     description: 1,
-    //     duration: 1,
-    //     createdAt: 1,
-    //     views: 1,
-    //     userName: 1,
-    //     firstName: 1,
-    //     lastName: 1,
-    //     avatar: 1
-    //   },
-    //   "User"
-    // );
     const video = await Video.aggregate([
       {
         $match: {
-          owner: user?._id
-        }
+          owner: req.user?._id,
+        },
       },
       {
         $lookup: {
           from: "likes",
           localField: "_id",
           foreignField: "video",
-          as: "likes"
-        }
+          as: "likes",
+        },
       },
       {
         $addFields: {
           likesCount: {
-            $size: "$likes"
-          }
-        }
+            $size: "$likes",
+          },
+        },
       },
       {
         $lookup: {
           from: "comments",
           localField: "_id",
           foreignField: "video",
-          as: "comments"
-        }
+          as: "comments",
+        },
       },
       {
         $addFields: {
           commentsCount: {
-            $size: "$comments"
-          }
-        }
+            $size: "$comments",
+          },
+        },
       },
       {
         $project: {
@@ -163,12 +132,12 @@ const getChannelVideos = asyncHandler(async (req, res) => {
           description: 1,
           title: 1,
           views: 1,
-        }
-      }
-    ])
+        },
+      },
+    ]);
 
-    if (!video || video.length === 0) {
-      throw new Error("no videos uplaoded by the user");
+    if (!video) {
+      throw new ApiError(401, "Video not found");
     }
 
     return res.status(200).json(new ApiResponse(201, "video fetched", video));
@@ -187,38 +156,38 @@ const getAllChannelVideos = asyncHandler(async (req, res) => {
     const video = await Video.aggregate([
       {
         $match: {
-          owner: req.user?._id
-        }
+          owner: req.user?._id,
+        },
       },
       {
         $lookup: {
           from: "likes",
           localField: "_id",
           foreignField: "video",
-          as: "likes"
-        }
+          as: "likes",
+        },
       },
       {
         $addFields: {
           likesCount: {
-            $size: "$likes"
-          }
-        }
+            $size: "$likes",
+          },
+        },
       },
       {
         $lookup: {
           from: "comments",
           localField: "_id",
           foreignField: "video",
-          as: "comments"
-        }
+          as: "comments",
+        },
       },
       {
         $addFields: {
           commentsCount: {
-            $size: "$comments"
-          }
-        }
+            $size: "$comments",
+          },
+        },
       },
       {
         $project: {
@@ -232,25 +201,23 @@ const getAllChannelVideos = asyncHandler(async (req, res) => {
           description: 1,
           title: 1,
           views: 1,
-        }
-      }
-    ])
+        },
+      },
+    ]);
 
-    if(!video){
-      throw new Error("Vidoes not found")
+    if (!video) {
+      throw new Error("Vidoes not found");
     }
 
-    return res.status(200).json(
-      new ApiResponse(201, "Videos fetched", video)
-    )
+    return res.status(200).json(new ApiResponse(201, "Videos fetched", video));
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({
       message: error?.message || "something went wrong",
       error: true,
-      success: false
-    })
+      success: false,
+    });
   }
-})
+});
 
 export { getChannelStats, getChannelVideos, getAllChannelVideos };

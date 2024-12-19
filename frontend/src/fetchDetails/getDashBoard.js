@@ -20,17 +20,16 @@ async function getDashboardStats(dispatch, userId) {
   }
 }
 
-async function getChannelVideos(dispatch, userId) {
+async function getChannelVideos(dispatch) {
     try {
-        const response = await fetch(`${fetchApi.channelStats.url}/videos/${userId}`,{
+        const response = await fetch(`${fetchApi.channelStats.url}/videos`,{
           method: "GET",
           credentials: "include"
         });
     
         const resData = await response.json();
         if(resData.data){
-            dispatch(setVideo(resData.data))
-            return resData.data
+            dispatch(setVideo(resData.data));
         }
     } catch (error) {
         console.log(error)

@@ -12,9 +12,6 @@ const fetchHistory = async (dispatch) => {
     });
 
     const dataRes = await response.json();
-
-    console.log(dataRes?.data);
-
     if (dataRes?.data) {
       dispatch(addUserHistory(dataRes.data));
       return dataRes.data;

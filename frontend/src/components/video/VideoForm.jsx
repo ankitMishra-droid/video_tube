@@ -8,7 +8,7 @@ import { PlusIcon } from "lucide-react";
 import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import UploadVideoModal from "@/components/video/UploadVideo";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addVideoStats } from "@/features/dashboardSlice";
 import { getChannelVideos } from "@/fetchDetails/getDashBoard";
 
@@ -98,7 +98,7 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
         toast.success("Video uploaded");
         dispatch(addVideoStats(result.data));
         closeModal();
-        getChannelVideos(dispatch, user?._id)
+        getChannelVideos(dispatch)
       }
     } catch (error) {
       console.error("Error uploading files:", error);

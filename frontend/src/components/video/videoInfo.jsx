@@ -228,7 +228,7 @@ const VideoInfo = ({ video }) => {
                 </button>
               </div>
               <div>
-                {video?.[0].owner._id !== user?._id && (
+                {video?.[0].owner?._id !== user?._id && (
                   <Button
                     onClick={toggleSubscribe}
                     className={`flex h-9 items-center px-2 rounded-lg ${

@@ -6,6 +6,6 @@ const dashBoardRoutes = Router();
 
 dashBoardRoutes.route("/videos").get(verifyJWT, getAllChannelVideos)
 dashBoardRoutes.route("/:channelID").get(checkUser, getChannelStats)
-dashBoardRoutes.route("/videos/:channelID").get(verifyJWT, getChannelVideos)
+dashBoardRoutes.route("/videos").get(verifyJWT, getChannelVideos)
 
 export { dashBoardRoutes }

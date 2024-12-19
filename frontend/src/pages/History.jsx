@@ -11,7 +11,6 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
 
-  console.log(authStatus);
   useEffect(() => {
     if (authStatus) {
       fetchHistory(dispatch).then(() => setLoading(false));
@@ -19,8 +18,6 @@ const History = () => {
   }, [authStatus]);
 
   const history = useSelector((state) => state.user.userHistory);
-
-  console.log(history?.[0]?.[0]);
 
   if (!authStatus) {
     return (
