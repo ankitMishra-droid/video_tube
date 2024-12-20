@@ -86,9 +86,9 @@ const VideoContainer = () => {
       >
         <div className="overflow-hidden mb-2">
           <div
-            className={`grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2 ${
+            className={`grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-6 ${
               videos.length < 4 &&
-              "sm:grid-cols-[repeat(auto-fit, _minmax(300px,0.34fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(300px,0.24fr))]"
+              "sm:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))]"
             }`}
           >
             {videos.map((video) => (

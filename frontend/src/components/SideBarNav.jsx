@@ -3,7 +3,6 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
-  Menu,
   MenuIcon,
   MessageCircle,
   Play,
@@ -21,7 +20,7 @@ import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import { removeUserDetails } from "@/features/authSlice";
 
-const SideBarNav = ({ setIsSidebarIsOpen }) => {
+const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
   const [show, setShow] = useState(false);
 
   const authStatus = useSelector((state) => state?.auth?.status);
@@ -59,10 +58,16 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
   useEffect(() => {
     if (location.pathname !== "/") {
       setShow(false);
+    } else if (location.pathname === "/" && window.innerWidth < 767) {
+      setShow(false);
     } else {
       setShow(true);
     }
   }, [location.pathname]);
+
+  // Function to check if the current path matches the link path
+  const isActiveLink = (path) => location.pathname === path;
+
   return (
     <>
       {location.pathname !== "/" && show && (
@@ -74,7 +79,7 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
       <div className="absolute top-[29px] left-1 z-50">
         <div className="text-left">
           <button
-            className="text-white"
+            className={`${textColor}`}
             type="button"
             aria-controls="drawer-navigation"
             aria-expanded={show}
@@ -112,7 +117,11 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="/"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <Home />
                   <span className="ms-3">Home</span>
@@ -121,17 +130,24 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/tweets")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <MessageCircle />
                   <span className="flex-1 ms-3 whitespace-nowrap">Tweets</span>
-                  <span className="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300"></span>
                 </Link>
               </li>
               <li>
                 <Link
-                  to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  to="liked-videos"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/liked-videos")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <ThumbsUp />
                   <span className="flex-1 ms-3 whitespace-nowrap">
@@ -142,7 +158,11 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="history"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/history")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <History />
                   <span className="flex-1 ms-3 whitespace-nowrap">History</span>
@@ -151,7 +171,11 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/videos")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <Play />
                   <span className="flex-1 ms-3 whitespace-nowrap">Videos</span>
@@ -161,7 +185,11 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                 {authStatus && (
                   <Link
                     to={`/admin/dashboard`}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                    className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                      isActiveLink("/admin/dashboard")
+                        ? "bg-gray-600 text-white"
+                        : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                    }`}
                   >
                     <LayoutDashboard />
                     <span className="flex-1 ms-3 whitespace-nowrap">
@@ -173,7 +201,11 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
               <li>
                 <Link
                   to="#"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
+                    isActiveLink("/subscriptions")
+                      ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <VideoIcon />
                   <span className="flex-1 ms-3 whitespace-nowrap">
@@ -198,7 +230,8 @@ const SideBarNav = ({ setIsSidebarIsOpen }) => {
                 <li>
                   <Link
                     to={"/settings"}
-                    className="flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                    className={`flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:hover:bg-gray-700 group ${isActiveLink("/settings") ? "bg-gray-600 text-white"
+                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600" }`}
                   >
                     <Settings />
                     <span className="flex-1 ms-3 whitespace-nowrap">

@@ -67,6 +67,10 @@ const fetchApi = {
     watchHistory: {
         url: `${backendDomain}/api/users/watch-history`,
         method: "GET"
+    },
+    getLikedVideos: {
+        url: `${backendDomain}/api/like/videos`,
+        method: "GET"
     }
 }
 

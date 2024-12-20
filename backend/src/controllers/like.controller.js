@@ -130,25 +130,65 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getAllLikedOnVideo = asyncHandler(async (req, res) => {
   try {
-    const userId = req.user?._id;
-    const user = new mongoose.Types.ObjectId(userId);
-
     const video = await Like.aggregate([
       {
         $match: {
-          likedBy: user,
-          video: {
-            $exists: true,
-          },
+          likedBy: new mongoose.Types.ObjectId(req.user?._id),
         },
       },
       {
         $lookup: {
-          from: "video",
+          from: "videos",
           localField: "video",
           foreignField: "_id",
-          as: "videos",
+          as: "video",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline:[
+                  {
+                    $project: {
+                      firstName: 1,
+                      lastName: 1,
+                      userName: 1,
+                      avatar: 1
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              $addFields: {
+                owner: {
+                  $first: "$owner"
+                }
+              }
+            }
+          ]
         },
+      },
+      {
+        $addFields: {
+          video: {
+            $first: "$video"
+          }
+        }
+      },
+      {
+        $match: {
+          video: {
+            $exists: true
+          }
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1
+        }
       },
     ]);
 

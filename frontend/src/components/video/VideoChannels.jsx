@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'
 
 const VideoChannels = ({videos}) => {
     const user = useSelector((state) => state.user.user)
-    console.log(user)
   return (
     <div>
       <div className='flex w-full'>

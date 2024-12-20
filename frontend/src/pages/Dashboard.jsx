@@ -22,7 +22,6 @@ const Dashboard = () => {
 
   const stats = useSelector((state) => state.dashboard.stats);
   const video = useSelector((state) => state.dashboard.videos);
-  // console.log(video);
 
   if(!status){
           return(

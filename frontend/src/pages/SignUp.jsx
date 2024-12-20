@@ -60,10 +60,6 @@ const SignUp = () => {
       });
 
       const dataRes = await response.json();
-
-      // Log the full response for better debugging
-      console.log(dataRes);
-
       if (dataRes.data) {
         toast.success(dataRes.message);
         navigate("/login");

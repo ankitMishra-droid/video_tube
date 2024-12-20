@@ -65,7 +65,7 @@ const ChannelVideos = () => {
       <EmptyChannelVideos />
     </div>
   ) : (
-    <div className="overflow-auto mt-2">
+    <div className="overflow-auto mt-4">
       <InfiniteScroll
         dataLength={videos.length}
         next={fetchMoreData}
@@ -111,9 +111,9 @@ const ChannelVideos = () => {
             Total Videos Uploaded: {videos.length}
           </p>
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-3 gap-2 ${
+          className={`grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-6 mt-4 ${
             videos?.length < 4 &&
-            "sm:grid-cols-[repeat(auto-fit,_minmax(300px,_0.34fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(300px,_0.24fr))]"
+            "sm:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))]"
           }`}
         >
           {videos.map((video) => (

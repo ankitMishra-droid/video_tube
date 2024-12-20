@@ -32,7 +32,6 @@ const Search = () => {
       );
 
       const resData = await response.json();
-      console.log(resData?.data);
       if (resData?.data.length > 0) {
         setVideos((prev) => [...prev, ...resData?.data]);
         if (resData?.data.length !== 10) {

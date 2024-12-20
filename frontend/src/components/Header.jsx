@@ -1,65 +1,84 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
-import { useTheme } from "./theme-provider";
-import { LucideSunDim, MoonIcon, User2 } from "lucide-react";
+import { User2 } from "lucide-react";
 import Logo from "./Logo";
 import { Link } from "react-router-dom";
 import Search from "./Search";
 import { useSelector } from "react-redux";
 import SideBarNav from "./SideBarNav";
 
-const Header = ({setIsSidebarIsOpen}) => {
+const Header = ({ setIsSidebarIsOpen }) => {
   const authStatus = useSelector((state) => state?.auth?.status);
   const user = useSelector((state) => state?.auth?.user);
-  const { theme, setTheme } = useTheme();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [bgColor, setBgColor] = useState("bg-transparent");
+  const [textColor, setTextColor] = useState("text-black");
 
-  const toggleMode = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+        setBgColor("bg-gray-800");
+        setTextColor("text-white");
+      } else {
+        setIsScrolled(false);
+        setBgColor("bg-white");
+        setTextColor("text-black");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="w-full bg-gray-700 py-6">
-      <div className="container mx-auto flex items-center align-middle justify-between md:gap-0 gap-2 px-4">
-        <SideBarNav setIsSidebarIsOpen={setIsSidebarIsOpen}/>
+    <nav
+      className={`w-full py-6 fixed top-0 left-0 right-0 z-50 transition-all shadow-md ${bgColor}`}
+    >
+      <div className="container mx-auto flex items-center justify-between px-4">
+        {/* Sidebar and Logo */}
+        <SideBarNav
+          setIsSidebarIsOpen={setIsSidebarIsOpen}
+          textColor={textColor}
+        />
         <Link
-          to={"/"}
+          to="/"
           className="hidden md:inline-block md:pl-7 pl-0 pr-3 md:pr-0"
         >
-          <Logo className={""} width={110} height={110} />
+          <Logo className="" width={110} height={110} />
         </Link>
-        <div className="pl-9 md:pl-0">
-          <Search />
-        </div>
-        {!authStatus && (
-          <>
-            <Button>
-              <Link to={"/login"}>Login</Link>
-            </Button>
-          </>
-        )}
 
-        {authStatus && user && (
+        {/* Search Component */}
+        <div className="pl-9 md:pl-0 flex-grow max-w-md">
+          <Search textColor={textColor} />
+        </div>
+
+        {/* User Info and Login Button */}
+        {!authStatus ? (
+          <Button>
+            <Link to="/login" className={textColor}>
+              Login
+            </Link>
+          </Button>
+        ) : (
           <div className="flex gap-3 items-center">
-            <Link to={`/channel/${user.userName}`} className="flex flex-col sm:flex-row items-center sm:gap-2">
+            <Link
+              to={`/channel/${user.userName}`}
+              className={`flex flex-col sm:flex-row items-center sm:gap-2 ${textColor}`}
+            >
               {user?.avatar ? (
                 <img
                   src={user.avatar}
                   alt={user.firstName}
-                  className="object-cover w-7 h-7 sm:w-10 sm:h-10 shrink-0 rounded-full"
+                  className="object-cover w-7 h-7 sm:w-10 sm:h-10 rounded-full object-fit"
                 />
               ) : (
-                <p className="text-white">
-                  <User2 />
-                </p>
+                <User2 className="text-white w-7 h-7 sm:w-10 sm:h-10 object-fit" />
               )}
-
-              <p className="text-white hidden sm:block">{user.firstName}</p>
+              <p className={`hidden sm:block ${textColor}`}>{user.firstName}</p>
             </Link>
           </div>
         )}
-        {/* <button onClick={toggleMode}>
-          {theme === "dark" ? <LucideSunDim /> : <MoonIcon />}
-        </button> */}
       </div>
     </nav>
   );

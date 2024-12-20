@@ -20,6 +20,7 @@ import Dashboard from "./pages/Dashboard";
 import Video from "./pages/Video";
 import Search from "./pages/Search";
 import History from "./pages/History";
+import LikedVideos from "./pages/LikedVideos";
 
 const router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: "/history",
         element: <History />
+      },
+      {
+        path: "/liked-videos",
+        element: <LikedVideos />
       },
     ],
   },

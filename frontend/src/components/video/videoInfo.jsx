@@ -64,7 +64,6 @@ const VideoInfo = ({ video }) => {
         );
 
         const resData = await response.json();
-        console.log(resData?.data);
         if (resData.data) {
           dispatch(
             setVideo({
@@ -96,7 +95,6 @@ const VideoInfo = ({ video }) => {
         );
 
         const dataRes = await response.json();
-        console.log(dataRes?.data);
         if (dataRes?.data) {
           const updatedOwner = {
             ...video?.[0].owner,
