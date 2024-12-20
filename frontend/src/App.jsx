@@ -63,7 +63,7 @@ function App() {
       <main
         className={`flex-1 transition-all duration-300 ease-in-out mt-[115px] ${
           isSidebarOpen
-            ? "ml-0 md:ml-64 px-3 py-2 2xl:container 2xl:mx-auto"
+            ? "ml-0 md:ml-64 px-3 py-2 2xl:container"
             : "ml-0 px-2 sm:px-6 2xl:container sm:mx-auto 2xl:px-2"
         }`}
       >
