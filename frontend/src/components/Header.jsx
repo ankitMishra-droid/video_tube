@@ -55,11 +55,11 @@ const Header = ({ setIsSidebarIsOpen }) => {
 
         {/* User Info and Login Button */}
         {!authStatus ? (
-          <Button>
+          <div>
             <Link to="/login" className={textColor}>
               Login
             </Link>
-          </Button>
+          </div>
         ) : (
           <div className="flex gap-3 items-center">
             <Link
