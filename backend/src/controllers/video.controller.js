@@ -524,6 +524,10 @@ const getUserVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, "fetched user videos", video));
 });
 
+const getUserSubscribedVideos = asyncHandler( async(req, res) => {
+  
+})
+
 export {
   publishVideo,
   getAllVideos,

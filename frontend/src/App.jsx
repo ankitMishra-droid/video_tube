@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import { Outlet, useLocation } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { healthCheck } from "./fetchDetails/healthCheck";

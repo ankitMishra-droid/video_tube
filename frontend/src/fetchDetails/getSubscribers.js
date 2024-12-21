@@ -9,7 +9,6 @@ async function getUserSubscriber(dispatch, subscribedId){
         });
     
         const resData = await response.json();
-        console.log(resData?.data)
         if(resData?.data){
             dispatch(addUserSubscribed(resData.data))
             return resData.data

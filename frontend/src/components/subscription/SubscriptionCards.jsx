@@ -25,7 +25,7 @@ const SubscriptionCards = ({ profile }) => {
     } else {
       try {
         const response = await fetch(
-          `${fetchApi.getUserSubscriber.url}/c/${profile._id}`,
+          `${fetchApi.getUserSubscriber.url}/c/${profile?._id}`,
           {
             method: "POST",
             credentials: "include",
@@ -36,7 +36,7 @@ const SubscriptionCards = ({ profile }) => {
         if (resData.data) {
           dispatch(
             toggleUserSubscribed({
-              profileId: profile._id,
+              profileId: profile?._id,
               isSubscribed: !profile?.isSubscribed,
               subscribersCount: profile?.isSubscribed
                 ? profile.subscribersCount - 1
@@ -56,7 +56,7 @@ const SubscriptionCards = ({ profile }) => {
   };
 
   return (
-    <li key={profile._id} className="flex justify-between my-2">
+    <li key={profile?._id} className="w-full flex justify-between my-2">
       <div className="flex items-center gap-x-3">
         <div className="h-12 w-12 shrink-0">
           <Link to={`/channel/${profile?.userName}`}>

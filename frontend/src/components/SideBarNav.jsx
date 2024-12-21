@@ -200,7 +200,7 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
               </li>
               <li>
                 <Link
-                  to="#"
+                  to="subscriptions"
                   className={`flex items-center p-2 rounded-lg dark:text-white group ${
                     isActiveLink("/subscriptions")
                       ? "bg-gray-600 text-white"

@@ -21,6 +21,7 @@ import Video from "./pages/Video";
 import Search from "./pages/Search";
 import History from "./pages/History";
 import LikedVideos from "./pages/LikedVideos";
+import Subscription from "./pages/Subscription";
 
 const router = createBrowserRouter([
   {
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
       {
         path: "/liked-videos",
         element: <LikedVideos />
+      },
+      {
+        path: "/subscriptions",
+        element: <Subscription />
       },
     ],
   },
