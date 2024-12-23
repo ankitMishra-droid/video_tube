@@ -23,7 +23,6 @@ const ForgotPassword = () => {
       });
 
       const dataRes = await response.json();
-      console.log(dataRes)
       if (dataRes?.success) {
         toast.success("reset link sent to your registered email");
         setEmail("");
