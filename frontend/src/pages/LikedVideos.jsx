@@ -41,7 +41,7 @@ const LikedVideos = () => {
 
   return (
     <div className="px-4 sm:px-8 lg:px-16">
-      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-6 sm:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))]">
+      <div className="grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-6 sm:grid-cols-[repeat(auto-fit,_minmax(270px,_0.24fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(270px,_0.30fr))]">
         {likedVideos?.[0]?.map((video) => (
           <div
             key={video?._id}
