@@ -111,9 +111,9 @@ const ChannelVideos = () => {
             Total Videos Uploaded: {videos.length}
           </p>
         <div
-          className={`grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-6 mt-4 ${
+          className={`grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] gap-6 mt-4 ${
             videos?.length < 4 &&
-            "sm:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(270px,_1fr))]"
+            "sm:grid-cols-[repeat(auto-fit,_minmax(300px,0.34fr))] 2xl:grid-cols-[repeat(auto-fit,_minmax(300px,0.24fr))]"
           }`}
         >
           {videos.map((video) => (

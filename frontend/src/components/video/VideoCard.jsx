@@ -15,7 +15,7 @@ const VideoCard = ({ video, name = true }) => {
   return (
     <>
       <Link
-        to={`/video/${video?.title}/${video?._id}`}
+        to={`/video/${encodeURIComponent(video?.title)}/${video?._id}`}
         className="shadow-lg hover:shadow-2xl transition-all rounded-xl h-full text-black border"
       >
         <div

@@ -8,6 +8,7 @@ import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import User from "../models/users.model.js";
+import { Subscription } from "../models/subscription.model.js";
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
@@ -524,9 +525,92 @@ const getUserVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, "fetched user videos", video));
 });
 
-const getUserSubscribedVideos = asyncHandler( async(req, res) => {
-  
-})
+const getUserSubscribedVideos = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, sortType = "desc" } = req.query;
+
+  const subscriber = await Subscription.find({
+    subscriber: new mongoose.Types.ObjectId(req.user?._id),
+  }).select("channel");
+
+  const channels = subscriber.map((sub) => sub.channel);
+
+  if (channels.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "No subscribed channels found", []));
+  }
+
+  const video = await Video.aggregate([
+    {
+      $match: {
+        owner: {
+          $in: channels.map((id) => new mongoose.Types.ObjectId(id)),
+        },
+      },
+    },
+    {
+      $match: { isPublished: true },
+    },
+    {
+      $sort: {
+        createdAt: sortType === "asc" ? 1 : -1,
+      },
+    },
+    {
+      $skip: (page - 1) * limit
+    },
+    {
+      $limit: parseInt(limit)
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+            $project: {
+              userName: 1,
+              firstName: 1,
+              lastName: 1,
+              avatar: 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      $addFields: {
+        owner: {
+          $first: "$owner"
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        owner: 1,
+        videoFile: 1,
+        thumbnail: 1,
+        createdAt: 1,
+        title: 1,
+        description: 1,
+        duration: 1,
+        views: 1,
+        isPublished: 1
+      }
+    }
+  ]);
+
+  if(!video){
+    throw new ApiError(401, "subscribed video fetching failed");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(201, "subscribed videos fetched", video)
+  )
+});
 
 export {
   publishVideo,
@@ -536,4 +620,5 @@ export {
   updateVideo,
   togglePublish,
   getUserVideo,
+  getUserSubscribedVideos,
 };
