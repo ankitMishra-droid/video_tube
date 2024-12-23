@@ -17,6 +17,8 @@ import {
 import {
   Check,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Copy,
   Ellipsis,
   EllipsisVertical,
@@ -37,7 +39,7 @@ const VideoInfo = ({ video }) => {
   const { videoId } = useParams();
 
   const toggleDescription = () => {
-    setShowFullDescription((prev) => !prev);
+    setShowFullDescription(!showFullDescription);
   };
 
   function copyToClipboard(e) {
@@ -261,16 +263,22 @@ const VideoInfo = ({ video }) => {
             {video?.[0].views} views {" • "} {timeDistance}
           </h4>
         </div>
-        <div className="mt-5 flex justify-between items-center">
+        <div className="mt-5 flex justify-between items-start">
           <p
             className={`font-semibold my-1 text-base ${
-              showFullDescription ? "" : "line-clamp-1"
+              showFullDescription ? "" : "line-clamp-2 md:line-clamp-1"
             }`}
           >
             {video?.[0].description ? video?.[0].description : "No description"}
           </p>
-          <button onClick={toggleDescription}>
-            {showFullDescription && <Ellipsis />}
+          <button onClick={toggleDescription} className="mt-2">
+            {
+              showFullDescription ? (
+                <ChevronUp />
+              ) : (
+                <ChevronDown />
+              )
+            }
           </button>
         </div>
       </div>

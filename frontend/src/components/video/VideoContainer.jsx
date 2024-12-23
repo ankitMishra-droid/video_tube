@@ -13,6 +13,8 @@ const VideoContainer = () => {
 
   const getVideos = async (page) => {
     try {
+      setLoading(true); 
+
       const response = await fetch(
         `${fetchApi.getAllVideos.url}?page=${page}&limit=10`,
         {
@@ -25,10 +27,17 @@ const VideoContainer = () => {
       );
 
       const resData = await response.json();
+      
       if (resData.data.length > 0) {
-        setVideos((prevVideos) => ([...prevVideos, ...resData.data]));
-        setLoading(false);
-        if (resData.data.length !== 20) {
+        // Check if the newly fetched videos are already in the list to avoid duplicates
+        setVideos((prevVideos) => {
+          const newVideos = resData.data.filter((newVideo) =>
+            !prevVideos.some((prevVideo) => prevVideo._id === newVideo._id)
+          );
+          return [...prevVideos, ...newVideos];
+        });
+
+        if (resData.data.length < 10) {
           setShowMore(false);
         }
       } else {
@@ -36,6 +45,7 @@ const VideoContainer = () => {
       }
     } catch (error) {
       console.log("Error in fetching videos: ", error);
+      toast.error("Failed to load videos");
     } finally {
       setLoading(false);
     }
@@ -46,10 +56,12 @@ const VideoContainer = () => {
   }, [page]);
 
   const fetchMoreVideos = () => {
-    setPage((prevPage) => prevPage + 1);
+    if (!loading && showMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
   };
 
-  if (loading) {
+  if (loading && page === 1 && videos.length === 0) {
     return (
       <div className="flex justify-center items-center mt-32">
         <img
@@ -76,12 +88,20 @@ const VideoContainer = () => {
         next={fetchMoreVideos}
         hasMore={showMore}
         loader={
-          <img
-            src={LoaderImg}
-            className="w-16 h-16 inline-block mx-auto"
-            alt="loaderImg"
-          />
+          <div className="flex justify-center">
+            <img
+              src={LoaderImg}
+              className="w-16 h-16 inline-block mx-auto"
+              alt="loading more videos"
+            />
+          </div>
         }
+        endMessage={
+          !showMore && (
+            <p className="text-center text-xl text-gray-500 mt-4">No more videos to load</p>
+          )
+        }
+        scrollThreshold={0.95}
         scrollableTarget="scrollableDiv"
       >
         <div className="overflow-hidden mb-2">

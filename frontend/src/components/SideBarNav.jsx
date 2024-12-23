@@ -219,13 +219,13 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
             <div className="absolute bottom-0 py-4 w-full left-0 right-0 overflow-hidden">
               <ul className="space-y-2 font-medium w-full">
                 <li>
-                  <button
+                  <Link
                     onClick={handleLogout}
-                    className="w-full flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
+                    className="flex items-center py-2 px-2 mx-5 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
                   >
                     <LogOut />
                     <span className="ms-3 whitespace-nowrap">Logout</span>
-                  </button>
+                  </Link>
                 </li>
                 <li>
                   <Link
