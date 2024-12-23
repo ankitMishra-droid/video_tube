@@ -20,9 +20,9 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     if (existedLike) {
       const removeLike = await Like.findByIdAndDelete(existedLike?._id);
 
-      if(!removeLike){
-        throw new ApiError(401, "error while remove like")
-      }
+      return res.status(200).json(
+        new ApiResponse(201, "liked status changed", {isLiked: false})
+      )
     }
 
     const liked = await Like.create({
@@ -36,7 +36,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .json(new ApiResponse(201, "liked status changed", {}));
+      .json(new ApiResponse(201, "liked status changed", {isLiked: true}));
   } catch (error) {
     console.log(error);
     return res.status(500).json({

@@ -22,9 +22,7 @@ const Comment = ({ video }) => {
   const status = useSelector((state) => state.auth.status);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
-  const [showComments, setShowComments] = useState(
-    window.innerWidth > 1023
-  );
+  const [showComments, setShowComments] = useState(window.innerWidth > 1023);
   const [data, setData] = useState({
     content: "",
   });
@@ -149,8 +147,8 @@ const Comment = ({ video }) => {
             value={data.content}
             onChange={handleChange}
             onFocus={() => {
-              if(!status){
-                navigate("/login")
+              if (!status) {
+                navigate("/login");
               }
             }}
           />
@@ -159,11 +157,11 @@ const Comment = ({ video }) => {
       </div>
 
       {window.innerWidth <= 1023 && (
-      <div className="flex justify-center py-2">
-        <button onClick={handleCommentShow}>
-          {showComments ? "Hide Comments" : "Show Comments"}
-        </button>
-      </div>
+        <div className="flex justify-center py-2">
+          <button onClick={handleCommentShow}>
+            {showComments ? "Hide Comments" : "Show Comments"}
+          </button>
+        </div>
       )}
 
       {showComments && (

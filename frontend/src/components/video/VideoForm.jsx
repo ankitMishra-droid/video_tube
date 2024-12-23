@@ -21,7 +21,7 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
     description: "",
     videoFile: null,
     thumbnail: null,
-    isPublished: true
+    isPublished: true,
   });
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,9 +49,9 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
   const togglePublish = (checked) => {
     setData((prevData) => ({
       ...prevData,
-      isPublished : checked
-    }))
-  }
+      isPublished: checked,
+    }));
+  };
 
   const handleThumbnailChange = (e) => {
     const thumbnail = e.target.files[0];
@@ -72,7 +72,7 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
     formData.append("description", data.description);
     formData.append("videoFile", data.videoFile);
     formData.append("thumbnail", data.thumbnail);
-    formData.append("isPublished", data.isPublished)
+    formData.append("isPublished", data.isPublished);
 
     if (!data.videoFile) {
       console.error("No video file found!");
@@ -98,7 +98,7 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
         toast.success("Video uploaded");
         dispatch(addVideoStats(result.data));
         closeModal();
-        getChannelVideos(dispatch)
+        getChannelVideos(dispatch);
       }
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -169,9 +169,14 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
         </div>
         <div className="flex items-center space-x-2">
           <Label htmlFor="isPublish">Publish</Label>
-          <Switch id="isPublish" name="isPublish" checked={data.isPublished} onCheckedChange={togglePublish}/>
+          <Switch
+            id="isPublish"
+            name="isPublish"
+            checked={data.isPublished}
+            onCheckedChange={togglePublish}
+          />
         </div>
-          {/* <span className="text-xs">Note.*By default the video is published</span> */}
+        {/* <span className="text-xs">Note.*By default the video is published</span> */}
         <div>
           <Button
             type="submit"
