@@ -71,6 +71,14 @@ const fetchApi = {
     getLikedVideos: {
         url: `${backendDomain}/api/like/videos`,
         method: "GET"
+    },
+    sendPasswordRestLink: {
+        url: `${backendDomain}/api/users/password-reset-link`,
+        method: "POST"
+    },
+    resetPassword: {
+        url: `${backendDomain}/api/users`,
+        methood: "POST"
     }
 }
 

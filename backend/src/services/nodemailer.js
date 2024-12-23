@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 
-const sendMail = async(email, subject, text) => {
+const sendMail = async(email, subject, text, htmlContent) => {
     try {
         const trasnporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -17,7 +17,8 @@ const sendMail = async(email, subject, text) => {
             from: process.env.NODEMAILER_EMAIL,
             to: email,
             subject: subject,
-            text: text
+            text: text,
+            html: htmlContent
         })
 
         // return res.status(200).json()

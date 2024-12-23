@@ -61,10 +61,10 @@ const SignUp = () => {
 
       const dataRes = await response.json();
       if (dataRes.data) {
-        toast.success(dataRes.message);
+        toast.success(dataRes.message || "successfully registered");
         navigate("/login");
       } else {
-        toast.error(dataRes.message || "Something went wrong");
+        toast.error(dataRes.meessage || "Something went wrong");
       }
     } catch (error) {
       console.error("Error during signup:", error);

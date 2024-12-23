@@ -22,6 +22,8 @@ import Search from "./pages/Search";
 import History from "./pages/History";
 import LikedVideos from "./pages/LikedVideos";
 import Subscription from "./pages/Subscription";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +92,14 @@ const router = createBrowserRouter([
         path: "/subscriptions",
         element: <Subscription />
       },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />
+      },
+      {
+        path: "/reset-password/:userId/:token",
+        element: <ResetPassword />
+      }
     ],
   },
   {

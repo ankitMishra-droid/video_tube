@@ -9,7 +9,11 @@ const tokenSchema = new Schema({
     token: {
         type: String,
         required: true
-    }
+    },
+    expiredAt: {
+        type: Date,
+        required: true
+    },
 }, {timestamps: true})
 
 export const UserToken = mongoose.model("UserToken", tokenSchema);

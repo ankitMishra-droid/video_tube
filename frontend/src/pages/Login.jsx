@@ -55,12 +55,10 @@ const Login = () => {
         dispatch(setUserDetails(dataRes.data.user));
         localStorage.setItem("accessToken", dataRes.data.accessToken);
 
-        toast.success(dataRes.message + "🤩");
+        toast.success(dataRes?.message + "🤩");
         navigate("/");
-      } else if (error.status === 403) {
-        setError((prev) => ({ ...prev, email: "User does not exist" }));
-      } else if (error.status === 405) {
-        setError((prev) => ({ ...prev, password: "Invalid password" }));
+      } else {
+        toast.error(dataRes?.meessage || "something went wrong")
       }
     } catch (error) {
       setError((prev) => ({ ...prev, general: "Something went wrong" }));
@@ -153,7 +151,7 @@ const Login = () => {
 
             <Link
               className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-              to="#"
+              to="/forgot-password"
             >
               Forgot Password?
             </Link>
