@@ -53,7 +53,7 @@ const createUser = asyncHandler(async (req, res) => {
     }
 
     const avatarPath = req.files?.avatar[0]?.path;
-    const coverAvatarPath = req.files?.coverAvatar[0]?.path;
+    // const coverAvatarPath = req.files?.coverAvatar[0]?.path;
 
     if (!avatarPath) {
       throw new ApiError(401, "profile image is required");
@@ -63,10 +63,10 @@ const createUser = asyncHandler(async (req, res) => {
       avatarPath,
       "registered_user_images"
     );
-    const coverAvatarFile = await uploadOnCloudinary(
-      coverAvatarPath,
-      "registered_user_images_cover_Avatar"
-    );
+    // const coverAvatarFile = await uploadOnCloudinary(
+    //   coverAvatarPath,
+    //   "registered_user_images_cover_Avatar"
+    // );
 
     // Check for existing user
     const existingUser = await User.findOne({ $or: [{ email }, { userName }] });
@@ -89,7 +89,7 @@ const createUser = asyncHandler(async (req, res) => {
       password,
       role: role || "USER",
       avatar: avatarFile.secure_url,
-      coverAvatar: coverAvatarFile.secure_url,
+      // coverAvatar: coverAvatarFile.secure_url,
     });
 
     const createdUser = await User.findOne({ _id: user._id }).select(
