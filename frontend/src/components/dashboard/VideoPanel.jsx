@@ -41,7 +41,7 @@ const VideoPanel = ({ channelVideos }) => {
 
   let videos = filter || channelVideos;
 
-  if(videos.length === 0){
+  if(videos?.length === 0){
     return(
       <div className="flex justify-center mt-10">
         <p>there is no video uploaded yet.</p>

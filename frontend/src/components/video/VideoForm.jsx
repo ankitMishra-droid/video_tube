@@ -1,20 +1,18 @@
-import React, { forwardRef, useState, useEffect } from "react";
-// import { Label, Input, Textarea, Button, Switch } from "@/components/ui";
-import { PlusIcon } from "lucide-react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import UploadVideoModal from "@/components/video/UploadVideo";
-import { useDispatch } from "react-redux";
-import { addVideoStats } from "@/features/dashboardSlice";
-import { getChannelVideos } from "@/fetchDetails/getDashBoard";
+import React, { forwardRef, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { PlusIcon } from "lucide-react";
 import fetchApi from "@/common";
+import { toast } from "react-toastify";
+import UploadVideoModal from "@/components/video/UploadVideo";
+import { useDispatch, useSelector } from "react-redux";
+import { addVideoStats } from "@/features/dashboardSlice";
+import { getChannelVideos } from "@/fetchDetails/getDashBoard";
 
-const VideoForm = forwardRef(({ closeModal, video = false}, ref) => {
+const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
   const [isUploading, setIsUploading] = useState(false);
   const [videoPreview, setVideoPreview] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
@@ -29,27 +27,41 @@ const VideoForm = forwardRef(({ closeModal, video = false}, ref) => {
   const [modalOpen, setModalOpen] = useState(false);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    return () => {
-      if (videoPreview) URL.revokeObjectURL(videoPreview);
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    };
-  }, [videoPreview, thumbnailPreview]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleFileChange = (e, type) => {
-    const file = e.target.files[0];
-    if (type === "video") {
-      setVideoPreview(URL.createObjectURL(file));
-      setData((prev) => ({ ...prev, videoFile: file }));
-    } else if (type === "thumbnail") {
-      setThumbnailPreview(URL.createObjectURL(file));
-      setData((prev) => ({ ...prev, thumbnail: file }));
-    }
+  const handleVideoChange = (e) => {
+    const videoFile = e.target.files[0];
+    setData((prevData) => ({
+      ...prevData,
+      videoFile: videoFile,
+    }));
+
+    const videoUrl = URL.createObjectURL(videoFile);
+    setVideoPreview(videoUrl);
+  };
+
+  const togglePublish = (checked) => {
+    setData((prevData) => ({
+      ...prevData,
+      isPublished: checked,
+    }));
+  };
+
+  const handleThumbnailChange = (e) => {
+    const thumbnail = e.target.files[0];
+    setData((prevData) => ({
+      ...prevData,
+      thumbnail: thumbnail,
+    }));
+
+    const thumbnailUrl = URL.createObjectURL(thumbnail);
+    setThumbnailPreview(thumbnailUrl);
   };
 
   const handleSubmit = async (e) => {
@@ -62,36 +74,34 @@ const VideoForm = forwardRef(({ closeModal, video = false}, ref) => {
     formData.append("thumbnail", data.thumbnail);
     formData.append("isPublished", data.isPublished);
 
+    if (!data.videoFile) {
+      console.error("No video file found!");
+      return;
+    }
+
     setIsUploading(true);
     setModalOpen(true);
 
     try {
-      const response = await axios.post(fetchApi.getAllVideos.url, formData, {
-        withCredentials: true,
-        onUploadProgress: (e) => {
-          const progress = Math.round((e.loaded * 100) / e.total);
-          console.log(`Progress: ${progress}%`);
-        },
+      const response = await fetch(`${fetchApi.getAllVideos.url}`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
       });
 
-      if (response.data) {
-        toast.success("Video uploaded successfully!");
-        dispatch(addVideoStats(response.data));
+      if (!response.ok) {
+        throw new Error("Error uploading media.");
+      }
+
+      const result = await response.json();
+      if (result.data) {
+        toast.success("Video uploaded");
+        dispatch(addVideoStats(result.data));
         closeModal();
         getChannelVideos(dispatch);
-        setData({
-          title: "",
-          description: "",
-          videoFile: null,
-          thumbnail: null,
-          isPublished: true,
-        });
-        setVideoPreview(null);
-        setThumbnailPreview(null);
       }
     } catch (error) {
-      console.error("Error uploading:", error);
-      toast.error("Upload failed!");
+      console.error("Error uploading files:", error);
     } finally {
       setIsUploading(false);
       setModalOpen(false);
@@ -101,44 +111,91 @@ const VideoForm = forwardRef(({ closeModal, video = false}, ref) => {
   return (
     <div>
       <form ref={ref} onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
         <div>
           <Label htmlFor="title">Title</Label>
-          <Input id="title" name="title" value={data.title} onChange={handleChange} required />
+          <Input
+            id="title"
+            name="title"
+            value={data.title}
+            onChange={handleChange}
+            required
+          />
         </div>
-        {/* Description */}
         <div>
           <Label htmlFor="description">Description</Label>
-          <Textarea id="description" name="description" value={data.description} onChange={handleChange} required />
+          <Textarea
+            id="description"
+            name="description"
+            value={data.description}
+            onChange={handleChange}
+            required
+          />
         </div>
-        {/* Video File */}
         <div>
           <Label htmlFor="videoFile">Video File</Label>
-          <Input id="videoFile" type="file" accept="video/*" onChange={(e) => handleFileChange(e, "video")} required />
-          {videoPreview && <video src={videoPreview} controls className="mt-2 max-w-full h-auto" />}
+          <Input
+            id="videoFile"
+            name="videoFile"
+            type="file"
+            accept="video/*"
+            onChange={handleVideoChange}
+            required
+          />
+          {videoPreview && (
+            <video
+              src={videoPreview}
+              controls
+              className="mt-2 max-w-full h-auto"
+            />
+          )}
         </div>
-        {/* Thumbnail */}
         <div>
           <Label htmlFor="thumbnail">Thumbnail File</Label>
-          <Input id="thumbnail" type="file" accept="image/*" onChange={(e) => handleFileChange(e, "thumbnail")} required />
-          {thumbnailPreview && <img src={thumbnailPreview} alt="Thumbnail preview" className="mt-2 max-w-full h-auto" />}
+          <Input
+            id="thumbnail"
+            name="thumbnail"
+            type="file"
+            accept="image/*"
+            onChange={handleThumbnailChange}
+            required
+          />
+          {thumbnailPreview && (
+            <img
+              src={thumbnailPreview}
+              alt="Thumbnail preview"
+              className="mt-2 max-w-full h-auto"
+            />
+          )}
         </div>
-        {/* Publish Toggle */}
         <div className="flex items-center space-x-2">
           <Label htmlFor="isPublish">Publish</Label>
-          <Switch id="isPublish" checked={data.isPublished} onCheckedChange={(val) => setData((prev) => ({ ...prev, isPublished: val }))} />
+          <Switch
+            id="isPublish"
+            name="isPublish"
+            checked={data.isPublished}
+            onCheckedChange={togglePublish}
+          />
         </div>
-        {/* Submit Button */}
+        {/* <span className="text-xs">Note.*By default the video is published</span> */}
         <div>
-          <Button type="submit" disabled={isUploading} className="flex justify-center items-center gap-2 bg-gray-800 text-white px-2 py-3 rounded-md hover:bg-gray-900 transition-all">
-            <PlusIcon className="w-5 h-5" />
+          <Button
+            type="submit"
+            disabled={isUploading}
+            className="flex justify-center items-center gap-2 bg-gray-800 text-white px-2 py-3 rounded-md hover:bg-gray-900 transition-all"
+          >
+            <PlusIcon className="w-5 h-5" />{" "}
             <span>{isUploading ? "Uploading..." : "Upload Video"}</span>
           </Button>
         </div>
       </form>
 
-      {/* Modal */}
-      <UploadVideoModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* Uploading Modal */}
+      <UploadVideoModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        updating={false}
+        video={data}
+      />
     </div>
   );
 });
