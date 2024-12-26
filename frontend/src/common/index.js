@@ -79,6 +79,10 @@ const fetchApi = {
     resetPassword: {
         url: `${backendDomain}/api/users`,
         methood: "POST"
+    },
+    getRefreshToken: {
+        url: `${backendDomain}/api/users/refresh-access-token`,
+        method: "GET"
     }
 }
 
