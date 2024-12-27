@@ -169,19 +169,6 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="#"
-                  className={`flex items-center p-2 rounded-lg dark:text-white group ${
-                    isActiveLink("/videos")
-                      ? "bg-gray-600 text-white"
-                      : "text-gray-900 hover:bg-gray-300 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  <Play />
-                  <span className="flex-1 ms-3 whitespace-nowrap">Videos</span>
-                </Link>
-              </li>
-              <li>
                 {authStatus && (
                   <Link
                     to={`/admin/dashboard`}

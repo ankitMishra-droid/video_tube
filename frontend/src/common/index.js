@@ -83,6 +83,10 @@ const fetchApi = {
     getRefreshToken: {
         url: `${backendDomain}/api/users/refresh-access-token`,
         method: "GET"
+    },
+    updatePersonalInfo: {
+        url: `${backendDomain}/api/users/update-user`,
+        method: "PATCH"
     }
 }
 

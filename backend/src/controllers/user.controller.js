@@ -202,8 +202,8 @@ const updateProfile = asyncHandler(async (req, res) => {
   try {
     const { firstName, lastName } = req.body;
 
-    if (!avatarFile || !coverAvatarFile) {
-      throw new ApiError(500, "Error uploading files to Cloudinary.");
+    if (!firstName || !lastName) {
+      throw new ApiError(500, "Error updating personal info.");
     }
 
     // Update the user profile
@@ -357,11 +357,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .cookie("refreshToken", newRefreshToken, options)
       .json(new ApiResponse(201, "Access token refreshed", user));
   } catch (error) {
-    return res
-      .status(500)
-      .json(
-        new ApiError(500, { message: error?.message || "somthing went wrong" })
-      );
+    return res.status(500).json({
+      meessage: error?.message || "something went wrong",
+      error: true,
+      success: false,
+    });
   }
 });
 

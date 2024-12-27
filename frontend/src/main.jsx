@@ -24,6 +24,7 @@ import LikedVideos from "./pages/LikedVideos";
 import Subscription from "./pages/Subscription";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Settings from "./pages/Settings";
 
 const router = createBrowserRouter([
   {
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
       {
         path: "/reset-password/:userId/:token",
         element: <ResetPassword />
+      },
+      {
+        path: "/settings",
+        element: <Settings />
       }
     ],
   },

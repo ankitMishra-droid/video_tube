@@ -8,7 +8,7 @@ const userRouter = Router();
 userRouter.route("/register").post(upload.fields([{name: "avatar", maxCount: 1}, {name: "coverAvatar", maxCount: 1}]) ,createUser)
 userRouter.route("/login").post(loginUser)
 userRouter.route("/logout").get(verifyJWT, logout)
-userRouter.route("/update-user").post(verifyJWT, updateProfile)
+userRouter.route("/update-user").patch(verifyJWT, updateProfile)
 userRouter.route("/update-avatar").post(verifyJWT, upload.fields([{name: "avatar", maxCount: 1}]), updateAvatar)
 userRouter.route("/change-password").post(verifyJWT, changePassword)
 userRouter.route("/get-current-user").get(verifyJWT, getCurrentUser)

@@ -48,18 +48,21 @@ axiosFetch.interceptors.response.use(
       originalRequest._retry = true; // Avoid infinite retries
 
       try {
-        const { data } = await axios.get("/users/refresh-access-token", {
-          withCredentials: true,
-        });
-        console.log(data.data.accessToken)
+        const { data } = await axios.post(
+          "/api/users/refresh-access-token",
+          {},
+          { withCredentials: true }
+        );
         localStorage.setItem("accessToken", data.data.accessToken);
         axiosFetch.defaults.headers.common["Authorization"] = `Bearer ${data.data.accessToken}`;
-        return axiosFetch(originalRequest); // Retry the original request
-      } catch (refreshError) {
-        toast.error("Session expired, please log in again.");
+        return axiosFetch(originalRequest);
+      } catch (err) {
+        console.error("Failed to refresh token:", err?.response || err); // Log response and error
         localStorage.removeItem("accessToken");
-        window.location.reload("/login"); // Redirect to login
+        window.location.reload();
+        toast.error("Session expired. Please login again!");
       }
+      
     }
     return Promise.reject(error);
   }

@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { setUserDetails } from "@/features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { getUseProfile } from "@/fetchDetails/getUserProfile";
 import GuestComponent from "../guest/GuestComponent";
 import { toast } from "react-toastify";
@@ -12,7 +18,13 @@ import userImg from "@/assets/user.png";
 import { Edit } from "lucide-react";
 
 // Sub-Component: Profile Header
-const ProfileHeader = ({ profile, user, status, navigate, toggleSubscribe }) => (
+const ProfileHeader = ({
+  profile,
+  user,
+  status,
+  navigate,
+  toggleSubscribe,
+}) => (
   <div className="flex flex-wrap gap-4 pb-4 pt-6">
     <span className="-mt-10 relative inline-block">
       <img
