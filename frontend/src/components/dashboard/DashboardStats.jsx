@@ -1,4 +1,4 @@
-import { EyeIcon, PlusIcon } from "lucide-react";
+import { EyeIcon, PlusIcon, ThumbsUp, User2Icon, Video } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -59,7 +59,7 @@ const DashboardStats = ({ stats }) => {
         </div>
         <div className="flex flex-col gap-y-3 px-2 border border-gray-900 rounded-md py-2">
           <div className="inline-block">
-            <EyeIcon />
+            <Video />
           </div>
           <div className="flex justify-between items-center">
             <p className="inline-block">Total Videos</p>
@@ -68,7 +68,7 @@ const DashboardStats = ({ stats }) => {
         </div>
         <div className="flex flex-col gap-y-3 px-2 border border-gray-900 rounded-md py-2">
           <div className="inline-block">
-            <EyeIcon />
+            <ThumbsUp />
           </div>
           <div className="flex justify-between items-center">
             <p className="inline-block">Total Likes</p>
@@ -77,7 +77,7 @@ const DashboardStats = ({ stats }) => {
         </div>
         <div className="flex flex-col gap-y-3 px-2 border border-gray-900 rounded-md py-2">
           <div className="inline-block">
-            <EyeIcon />
+            <User2Icon />
           </div>
           <div className="flex justify-between items-center">
             <p className="inline-block">Total Subscribers</p>

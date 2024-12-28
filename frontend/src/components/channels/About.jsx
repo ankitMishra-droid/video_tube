@@ -21,7 +21,7 @@ const About = () => {
   const getAboutDetails = async () => {
     try {
       const response = await fetch(
-        `${fetchApi.getAboutChannel.url}/${user._id}`,
+        `${fetchApi.getAboutChannel.url}/${user?._id}`,
         {
           method: fetchApi.getAboutChannel.method,
           credentials: "include",
@@ -32,6 +32,8 @@ const About = () => {
 
       if (dataRes.success) {
         setAboutChannel(dataRes?.data);
+      }else{
+        toast.error(dataRes?.message)
       }
     } catch (error) {
       toast.error("somthing went wrong");

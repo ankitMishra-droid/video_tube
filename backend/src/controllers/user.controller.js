@@ -284,7 +284,7 @@ const changePassword = asyncHandler(async (req, res) => {
     const checkPassword = await user.isPasswordCorrect(oldPassword);
 
     if (!checkPassword) {
-      throw new ApiError(401, "password is incorrect.");
+      throw new ApiError(401, "old password is incorrect.");
     }
 
     user.password = newPassword;
@@ -293,15 +293,15 @@ const changePassword = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .clearCookie("accessToken")
-      .clearCookie("refreshToken")
+      // .clearCookie("accessToken")
+      // .clearCookie("refreshToken")
       .json(new ApiResponse(201, "Password changed successfully.", {}));
   } catch (error) {
-    return res
-      .status(500)
-      .json(
-        new ApiError(500, { message: error?.message || "somthing went wrong" })
-      );
+    return res.status(500).json({
+      meessage: error?.message || "something went wrong",
+      error: true,
+      success: false,
+    });
   }
 });
 

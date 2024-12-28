@@ -16,7 +16,7 @@ const VideoContainer = () => {
       setLoading(true); 
 
       const response = await fetch(
-        `${fetchApi.getAllVideos.url}?page=${page}&limit=10`,
+        `${fetchApi.getAllVideos.url}?page=${page}&limit=20`,
         {
           method: fetchApi.getAllVideos.method,
           credentials: "include",
@@ -37,7 +37,7 @@ const VideoContainer = () => {
           return [...prevVideos, ...newVideos];
         });
 
-        if (resData.data.length < 10) {
+        if (resData.data.length < 20) {
           setShowMore(false);
         }
       } else {

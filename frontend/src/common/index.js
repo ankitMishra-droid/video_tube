@@ -87,6 +87,10 @@ const fetchApi = {
     updatePersonalInfo: {
         url: `${backendDomain}/api/users/update-user`,
         method: "PATCH"
+    },
+    updatePassword: {
+        url: `${backendDomain}/api/users/change-password`,
+        method: "POST"
     }
 }
 

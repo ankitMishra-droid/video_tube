@@ -13,7 +13,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const { channelID } = req.params;
 
     if (!isValidObjectId(channelID)) {
-      throw new Error("invalid channelId");
+      throw new Error("invalid user id");
     }
 
     const user = await User.findById(channelID);
