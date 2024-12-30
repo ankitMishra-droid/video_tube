@@ -39,7 +39,7 @@ const Login = () => {
     setError({ email: "", password: "", general: "" });
 
     try {
-      const response = await axiosFetch.post("/users/login", data);
+      const response = await axiosFetch.post("/api/users/login", data);
 
       if (response.data.success) {
         // Store user details in Redux

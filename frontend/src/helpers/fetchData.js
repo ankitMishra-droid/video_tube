@@ -3,8 +3,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Create axios instance for API calls
+const backendDomain =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL_PROD
+    : import.meta.env.VITE_BACKEND_URL_DEV;
+
 const axiosFetch = axios.create({
-  baseURL: "http://localhost:7000/api",
+  baseURL: backendDomain,
   withCredentials: true, // Important for handling cookies
   timeout: 5000,
 });
@@ -43,7 +48,7 @@ axiosFetch.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem("refreshToken"); // Retrieve the stored refresh token.
 
-        const response = await axios.post("/users/refresh-access-token", {
+        const response = await axios.post("/api/users/refresh-access-token", {
           refreshToken,
         });
 
