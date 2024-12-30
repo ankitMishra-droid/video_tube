@@ -6,7 +6,6 @@ import { useDispatch } from "react-redux";
 import { setUserDetails } from "@/features/authSlice";
 import { Eye, EyeClosed } from "lucide-react";
 import axiosFetch from "@/helpers/fetchData";
-import fetchApi from "@/common";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -40,28 +39,40 @@ const Login = () => {
     setError({ email: "", password: "", general: "" });
 
     try {
-      const response = await fetch(fetchApi.login.url, {
-        method: fetchApi.login.method,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosFetch.post("/users/login", data);
 
-      const dataRes = await response.json();
+      if (response.data.success) {
+        // Store user details in Redux
+        dispatch(setUserDetails(response.data.data.user));
 
-      if (response.ok && dataRes.success) {
-        dispatch(setUserDetails(dataRes.data.user));
-        localStorage.setItem("accessToken", dataRes.data.accessToken);
+        // Store access token in localStorage
+        localStorage.setItem("accessToken", response.data.data.accessToken);
 
-        toast.success(dataRes?.message + "🤩");
+        // Show success message
+        toast.success(response.data.message + "🤩");
+
+        // Navigate to home
         navigate("/");
-      } else {
-        toast.error(dataRes?.meessage || "something went wrong")
       }
     } catch (error) {
-      setError((prev) => ({ ...prev, general: "Something went wrong" }));
+      // Handle specific validation errors
+      if (error.response?.status === 404) {
+        setError((prev) => ({ ...prev, email: "Email is required" }));
+      } else if (error.response?.status === 401) {
+        setError((prev) => ({ ...prev, password: "Password is required" }));
+      } else if (error.response?.status === 403) {
+        setError((prev) => ({ ...prev, email: "User does not exist" }));
+      } else if (error.response?.status === 405) {
+        setError((prev) => ({
+          ...prev,
+          password: "Wrong password, please try again",
+        }));
+      } else {
+        setError((prev) => ({
+          ...prev,
+          general: error.response?.data?.message || "Something went wrong",
+        }));
+      }
     } finally {
       setLoading(false);
     }

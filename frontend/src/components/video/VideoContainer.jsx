@@ -13,7 +13,7 @@ const VideoContainer = () => {
 
   const getVideos = async (page) => {
     try {
-      setLoading(true); 
+      setLoading(true);
 
       const response = await fetch(
         `${fetchApi.getAllVideos.url}?page=${page}&limit=20`,
@@ -27,12 +27,13 @@ const VideoContainer = () => {
       );
 
       const resData = await response.json();
-      
+
       if (resData.data.length > 0) {
         // Check if the newly fetched videos are already in the list to avoid duplicates
         setVideos((prevVideos) => {
-          const newVideos = resData.data.filter((newVideo) =>
-            !prevVideos.some((prevVideo) => prevVideo._id === newVideo._id)
+          const newVideos = resData.data.filter(
+            (newVideo) =>
+              !prevVideos.some((prevVideo) => prevVideo._id === newVideo._id)
           );
           return [...prevVideos, ...newVideos];
         });
@@ -98,7 +99,9 @@ const VideoContainer = () => {
         }
         endMessage={
           !showMore && (
-            <p className="text-center text-xl text-gray-500 mt-4">No more videos to load</p>
+            <p className="text-center text-xl text-gray-500 mt-4">
+              No more videos to load
+            </p>
           )
         }
         scrollThreshold={0.95}
