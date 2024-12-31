@@ -92,14 +92,14 @@ const VideocardDash = ({ video }) => {
     e.preventDefault();
 
     try {
-      const response = await axiosFetch.patch(`/video/${video?._id}`);
+      const response = await axiosFetch.patch(`/video/${video?._id}`, data);
 
-      if (response?.data?.ok) {
+      if (response?.data) {
         closeModal();
-        toast.success("Video updated successfully!");
+        toast.success(response.data.message || "Video updated successfully!");
         getChannelVideos(dispatch, user?._id);
       } else {
-        toast.error("Error updating video");
+        toast.error(response.data.data.meessage || "Error updating video");
       }
     } catch (error) {
       console.error("Error updating video:", error);

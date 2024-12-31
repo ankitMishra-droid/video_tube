@@ -82,7 +82,9 @@ const VideoInfo = ({ video }) => {
     e.preventDefault();
     if (status) {
       try {
-        const response = await axiosFetch.post(`/subscribe/c/${video?.[0].owner._id}`);
+        const response = await axiosFetch.post(
+          `/subscribe/c/${video?.[0].owner._id}`
+        );
 
         if (response?.data?.data) {
           const updatedOwner = {
@@ -251,21 +253,15 @@ const VideoInfo = ({ video }) => {
           </h4>
         </div>
         <div className="mt-5 flex justify-between items-start">
-          <p
-            className={`font-semibold my-1 text-base ${
+          <pre
+            className={`font-sans font-semibold my-1 text-base whitespace-pre-line break-words ${
               showFullDescription ? "" : "line-clamp-2 md:line-clamp-1"
             }`}
           >
             {video?.[0].description ? video?.[0].description : "No description"}
-          </p>
+          </pre>
           <button onClick={toggleDescription} className="mt-2">
-            {
-              showFullDescription ? (
-                <ChevronUp />
-              ) : (
-                <ChevronDown />
-              )
-            }
+            {showFullDescription ? <ChevronUp /> : <ChevronDown />}
           </button>
         </div>
       </div>
