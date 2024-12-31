@@ -9,6 +9,7 @@ import VideoPlayer from "@/components/video/VideoPlayer";
 import VideoInfo from "@/components/video/videoInfo";
 import Comment from "@/components/Comment";
 import VideoListCard from "@/components/video/VideoListCard";
+import axiosFetch from "@/helpers/fetchData";
 
 const Video = () => {
   const { videoTitle, videoId } = useParams();
@@ -22,18 +23,11 @@ const Video = () => {
   const fetchVideo = async () => {
     setError("");
     try {
-      const response = await fetch(`${fetchApi.getAllVideos.url}/${videoId}`, {
-        method: fetchApi.getAllVideos.method,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axiosFetch.get(`/video/${videoId}`);
 
-      const resData = await response.json();
-
-      if (resData.data) {
-        dispatch(setVideo(resData.data));
+      console.log(response?.data)
+      if (response?.data?.data) {
+        dispatch(setVideo(response.data.data));
       }
     } catch (error) {
       setError(
@@ -49,13 +43,10 @@ const Video = () => {
 
   const fetchRelatedVideo = async() => {
     try {
-      const response = await fetch(`${fetchApi.getAllVideos.url}?sortBy=views&limit=15`, {
-        method: "GET"
-      })
+      const response = await axiosFetch.get(`/video?sortBy=views&limit=15`)
 
-      const dataRes = await response.json();
-      if(dataRes?.data){
-        setVideos(dataRes?.data)
+      if(response?.data?.data){
+        setVideos(response?.data?.data)
       }
     } catch (error) {
       console.log('error while fetching related videos, ', error)

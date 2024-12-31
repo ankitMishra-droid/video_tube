@@ -291,11 +291,13 @@ const changePassword = asyncHandler(async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
 
-    return res
-      .status(200)
-      // .clearCookie("accessToken")
-      // .clearCookie("refreshToken")
-      .json(new ApiResponse(201, "Password changed successfully.", {}));
+    return (
+      res
+        .status(200)
+        // .clearCookie("accessToken")
+        // .clearCookie("refreshToken")
+        .json(new ApiResponse(201, "Password changed successfully.", {}))
+    );
   } catch (error) {
     return res.status(500).json({
       meessage: error?.message || "something went wrong",
@@ -322,40 +324,42 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incommingRequest = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incommingRequest) {
+    throw new ApiError(401, "Unauthoried token");
+  }
+
   try {
-    const incommingRequest = req.cookies.refreshToken || req.body.refreshToken;
-
-    if (!incommingRequest) {
-      throw new ApiError(401, "Unauthoried token");
-    }
-
     const decodedToken = jwt.verify(
       incommingRequest,
       process.env.REFRESH_TOKEN_SECRET
     );
-
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      throw new ApiError(401, "invalid refresh token.");
+      throw new ApiError(401, "Invalid refresh token");
     }
 
-    if (incommingRequest !== user.refreshToken) {
-      throw new ApiError(401, "refresh token epired or used.");
+    if (incommingRequest !== user?.refreshToken) {
+      throw new ApiError(401, "Refresh token is expired or used");
     }
 
     const options = {
       httpOnly: true,
       secure: true,
+      sameSite: "None",
     };
-    const { accessToken, newRefreshToken } =
-      await generateAccessTokenAndRefreshToken(user._id);
+
+    const { accessToken } = await generateAccessTokenAndRefreshToken(
+      user._id,
+      1
+    );
 
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", newRefreshToken, options)
-      .json(new ApiResponse(201, "Access token refreshed", user));
+      .json(new ApiResponse(200, "Access token refreshed", { accessToken }));
   } catch (error) {
     return res.status(500).json({
       meessage: error?.message || "something went wrong",

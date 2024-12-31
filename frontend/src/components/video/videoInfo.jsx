@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import axiosFetch from "@/helpers/fetchData";
 
 const VideoInfo = ({ video }) => {
   const timeDistance = getTimeDistance(video?.[0].createdAt);
@@ -57,16 +58,9 @@ const VideoInfo = ({ video }) => {
       return;
     } else {
       try {
-        const response = await fetch(
-          `${fetchApi.toggleLike.url}/toggle/v/${videoId}`,
-          {
-            method: fetchApi.toggleLike.method,
-            credentials: "include",
-          }
-        );
+        const response = await axiosFetch.post(`/like/toggle/v/${videoId}`);
 
-        const resData = await response.json();
-        if (resData.data) {
+        if (response.data.data) {
           dispatch(
             setVideo({
               ...video,
@@ -88,16 +82,9 @@ const VideoInfo = ({ video }) => {
     e.preventDefault();
     if (status) {
       try {
-        const response = await fetch(
-          `${fetchApi.getUserSubscriber.url}/c/${video?.[0].owner._id}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        );
+        const response = await axiosFetch.post(`/subscribe/c/${video?.[0].owner._id}`);
 
-        const dataRes = await response.json();
-        if (dataRes?.data) {
+        if (response?.data?.data) {
           const updatedOwner = {
             ...video?.[0].owner,
             isSubscribed: !video?.[0].owner.isSubscribed,

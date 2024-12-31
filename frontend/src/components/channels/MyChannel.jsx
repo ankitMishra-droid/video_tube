@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import logo from "@/assets/logo.png";
 import userImg from "@/assets/user.png";
 import { Edit } from "lucide-react";
+import axiosFetch from "@/helpers/fetchData";
 
 // Sub-Component: Profile Header
 const ProfileHeader = ({
@@ -124,15 +125,8 @@ const MyChannel = () => {
   const toggleSubscribe = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `${fetchApi.userSubscribe.url}/${profile?._id}`,
-        {
-          method: fetchApi.userSubscribe.method,
-          credentials: "include",
-        }
-      );
-      const dataRes = await response.json();
-      if (dataRes.success) {
+      const response = await axiosFetch.post(`/subscribe/c/${profile?._id}`);
+      if (response?.data?.success) {
         setProfile((prev) => ({
           ...prev,
           isSubscribed: !prev.isSubscribed,

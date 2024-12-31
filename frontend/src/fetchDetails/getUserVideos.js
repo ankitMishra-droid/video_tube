@@ -1,5 +1,6 @@
 import fetchApi from "@/common";
 import { addUserVideos } from "@/features/userSlice";
+import axiosFetch from "@/helpers/fetchData";
 
 const getUserVideo = async (
   dispatch,
@@ -16,20 +17,15 @@ const getUserVideo = async (
   }).toString();
 
   try {
-    const response = await fetch(`${fetchApi.getUserVideo.url}/${userId}?${params}`, {
-      method: fetchApi.getUserVideo.method,
-      credentials: "include",
-    });
+    const response = await axiosFetch.get(`/video/c/${userId}?${params}`);
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
-    }
+    // if (!response?.data.ok) {
+    //   throw new Error(`Error: ${response.status}`);
+    // }
 
-    const dataRes = await response.json();
-    
-    if (dataRes?.data) {
-      dispatch(addUserVideos(dataRes?.data));
-      return dataRes.data;
+    if (response?.data?.data) {
+      dispatch(addUserVideos(response?.data?.data));
+      return response.data.data;
     }
   } catch (error) {
     console.error("Error fetching user videos:", error);

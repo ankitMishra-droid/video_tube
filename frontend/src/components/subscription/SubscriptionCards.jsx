@@ -6,6 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { BellIcon, CheckCircle } from "lucide-react";
+import axiosFetch from "@/helpers/fetchData";
 
 const SubscriptionCards = ({ profile }) => {
   const location = useLocation();
@@ -24,16 +25,9 @@ const SubscriptionCards = ({ profile }) => {
       );
     } else {
       try {
-        const response = await fetch(
-          `${fetchApi.getUserSubscriber.url}/c/${profile?._id}`,
-          {
-            method: "POST",
-            credentials: "include",
-          }
-        );
+        const response = await axiosFetch.post(`/subscribe/c/${profile?._id}`);
 
-        const resData = await response.json();
-        if (resData.data) {
+        if (response?.data?.data) {
           dispatch(
             toggleUserSubscribed({
               profileId: profile?._id,

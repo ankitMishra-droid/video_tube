@@ -30,7 +30,7 @@ const ChannelVideos = () => {
     setLoading(true);
     getUserVideo(dispatch, userId, sortType, page).then((data) => {
       setLoading(false);
-      if (data.length !== 10) {
+      if (data?.length !== 10) {
         setHasMore(false);
       }
     });

@@ -23,6 +23,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { getChannelVideos } from "@/fetchDetails/getDashBoard";
+import axiosFetch from "@/helpers/fetchData";
 
 const VideocardDash = ({ video }) => {
   const dispatch = useDispatch();
@@ -48,14 +49,9 @@ const VideocardDash = ({ video }) => {
 
   const handleTogglePublish = async () => {
     try {
-      const response = await fetch(`${fetchApi.getAllVideos.url}/${video?._id}`, {
-        method: "PUT",
-        credentials: "include",
-      });
+      const response = await axiosFetch.put(`/video/${video?._id}`);
 
-      const resData = await response.json();
-
-      if (resData?.data) {
+      if (response?.data?.data) {
         dispatch(
           updateVideoPublishStatus({
             videoId: video._id,
@@ -79,17 +75,9 @@ const VideocardDash = ({ video }) => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
-        `${fetchApi.getAllVideos.url}/${video._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response = await axiosFetch.delete(`/video/${video._id}`);
 
-      const resData = await response.json();
-
-      if (resData.data) {
+      if (response?.data?.data) {
         dispatch(deleteVideo(video._id));
         toast.success("Video deleted");
         getChannelVideos(dispatch, user?._id);
@@ -104,20 +92,9 @@ const VideocardDash = ({ video }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `${fetchApi.getAllVideos.url}/${video?._id}`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await axiosFetch.patch(`/video/${video?._id}`);
 
-      // const resData = await response.json();
-      if (response?.ok) {
+      if (response?.data?.ok) {
         closeModal();
         toast.success("Video updated successfully!");
         getChannelVideos(dispatch, user?._id);

@@ -12,7 +12,7 @@ userRouter.route("/update-user").patch(verifyJWT, updateProfile)
 userRouter.route("/update-avatar").post(verifyJWT, upload.fields([{name: "avatar", maxCount: 1}]), updateAvatar)
 userRouter.route("/change-password").post(verifyJWT, changePassword)
 userRouter.route("/get-current-user").get(verifyJWT, getCurrentUser)
-userRouter.route("/refresh-access-token").get(verifyJWT, refreshAccessToken)
+userRouter.route("/refresh-access-token").post(verifyJWT, refreshAccessToken)
 userRouter.route("/channel-name/:username").get(getUserChannelProfile)
 userRouter.route("/watch-history").get(verifyJWT, getWatchHistory)
 userRouter.route("/password-reset-link").post(sendResetLink);

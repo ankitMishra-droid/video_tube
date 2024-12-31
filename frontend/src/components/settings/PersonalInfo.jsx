@@ -7,6 +7,7 @@ import fetchApi from "@/common";
 import { setUserDetails } from "@/features/authSlice";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import axiosFetch from "@/helpers/fetchData";
 
 const PersonalInfo = () => {
   const status = useSelector((state) => state.auth.status);
@@ -32,22 +33,16 @@ const PersonalInfo = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(`${fetchApi.updatePersonalInfo.url}`, {
-        method: fetchApi.updatePersonalInfo.method,
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosFetch.patch(`/users/update-user`, data);
 
-      const dataRes = await response.json();
-      if (dataRes?.data) {
-        dispatch(setUserDetails(dataRes.data));
-        toast.success(dataRes?.message || "Updated");
+      if (response?.data?.data) {
+        dispatch(setUserDetails(response.data.data));
+        toast.success(response?.data?.message || "Updated");
+      }else{
+        toast.error(response?.data?.meessage || "something went wrong");
       }
     } catch (error) {
-      toast.error(dataRes?.message || "something went wrong");
+      toast.error("something went wrong");
       console.log(error);
     } finally {
       setLoading(false);

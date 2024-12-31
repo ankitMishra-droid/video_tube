@@ -15,7 +15,8 @@ function App() {
 
   useEffect(() => {
     healthCheck().then(() => {
-      getCurrentUser(dispatch).then(() => {
+      getCurrentUser(dispatch)
+      .then(() => {
         setLoading(false);
       });
     });

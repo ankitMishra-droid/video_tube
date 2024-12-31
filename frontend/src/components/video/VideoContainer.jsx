@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import LoaderImg from "@/assets/loader.gif";
 import InfiniteScroll from "react-infinite-scroll-component";
 import VideoCard from "./VideoCard";
+import axiosFetch from "@/helpers/fetchData";
 
 const VideoContainer = () => {
   const [videos, setVideos] = useState([]);
@@ -15,30 +16,19 @@ const VideoContainer = () => {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        `${fetchApi.getAllVideos.url}?page=${page}&limit=20`,
-        {
-          method: fetchApi.getAllVideos.method,
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axiosFetch.get(`/video?page=${page}&limit=20`);
 
-      const resData = await response.json();
-
-      if (resData.data.length > 0) {
+      if (response.data.data.length > 0) {
         // Check if the newly fetched videos are already in the list to avoid duplicates
         setVideos((prevVideos) => {
-          const newVideos = resData.data.filter(
+          const newVideos = response.data.data.filter(
             (newVideo) =>
               !prevVideos.some((prevVideo) => prevVideo._id === newVideo._id)
           );
           return [...prevVideos, ...newVideos];
         });
 
-        if (resData.data.length < 20) {
+        if (response.data.data.length < 20) {
           setShowMore(false);
         }
       } else {

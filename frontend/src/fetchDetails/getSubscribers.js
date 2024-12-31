@@ -1,17 +1,13 @@
-import fetchApi from "@/common";
 import { addUserSubscribed } from "@/features/userSlice";
+import axiosFetch from "@/helpers/fetchData";
 
 async function getUserSubscriber(dispatch, subscribedId){
     try {
-        const response = await fetch(`${fetchApi.getUserSubscriber.url}/a/${subscribedId}`, {
-            method: fetchApi.getUserSubscriber.method,
-            credentials: "include"
-        });
+        const response = await axiosFetch.get(`/subscribe/a/${subscribedId}`);
     
-        const resData = await response.json();
-        if(resData?.data){
-            dispatch(addUserSubscribed(resData.data))
-            return resData.data
+        if(response?.data?.data){
+            dispatch(addUserSubscribed(response.data.data))
+            return response.data.data
         }
     } catch (error) {
         console.log(error)

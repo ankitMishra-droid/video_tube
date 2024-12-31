@@ -1,17 +1,13 @@
-import fetchApi from "@/common";
 import { addLikedVideos } from "@/features/userSlice";
+import axiosFetch from "@/helpers/fetchData";
 
 export const fetchLikedVideos = async(dispatch) => {
     try {
-        const response = await fetch(`${fetchApi.getLikedVideos.url}`, {
-            method: fetchApi.getLikedVideos.method,
-            credentials: "include"
-        });
+        const response = await axiosFetch.get("/like/videos");
 
-        const dataRes = await response.json();
-        if(dataRes?.data){
-            dispatch(addLikedVideos(dataRes.data))
-            return dataRes.data;
+        if(response?.data?.data){
+            dispatch(addLikedVideos(response.data.data))
+            return response.data.data;
         }
     } catch (error) {
         console.log(error)

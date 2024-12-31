@@ -34,6 +34,6 @@ app.use("/api/tweet", tweetRoutes)
 app.use("/api/subscribe", subscriptionRoutes)
 app.use("/api/playlist", playlistRoutes)
 app.use("/api/dashboard", dashBoardRoutes)
-app.use("/healthCheck", healthCheckRouter)
+app.use("/api/healthCheck", healthCheckRouter)
 
 export { app };

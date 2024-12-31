@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import fetchApi from "@/common";
+import axiosFetch from "@/helpers/fetchData";
 
 const ChangePassword = () => {
   const status = useSelector((state) => state.auth.status);
@@ -32,25 +33,17 @@ const ChangePassword = () => {
       if(data.newPassword !== data.confirmPassword){
         toast.error("confirm password mismatch")
       }else{
-        const response = await fetch(`${fetchApi.updatePassword.url}`, {
-          method: fetchApi.updatePassword.method,
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
-        });
+        const response = await axiosFetch.post(`/users/change-password`, data);
 
-        const dataRes = await response.json()
-        if(dataRes?.data){
-          toast.success(dataRes?.meessage || "Password Changed Successfully.")
+        if(response?.data?.data){
+          toast.success(response?.data?.meessage || "Password Changed Successfully.")
           setData({
             oldPassword: "",
             newPassword: "",
             confirmPassword: ""
           })
         }else{
-          toast.error(dataRes?.meessage || "something went wrong")
+          toast.error(response?.data?.meessage || "something went wrong")
         }
       }
     } catch (error) {

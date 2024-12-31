@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import loadingGif from "@/assets/loader.gif";
+import axiosFetch from "@/helpers/fetchData";
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -14,20 +15,13 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(`${fetchApi.sendPasswordRestLink.url}`, {
-        method: fetchApi.sendPasswordRestLink.method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await axiosFetch.post(`/users/password-reset-link`, email);
 
-      const dataRes = await response.json();
-      if (dataRes?.success) {
+      if (response?.data?.success) {
         toast.success("reset link sent to your registered email");
         setEmail("");
       }else{
-        toast.error(dataRes?.meessage)
+        toast.error(response?.data?.meessage)
       }
     } catch (error) {
       console.log("error while sending forgot email link", error);

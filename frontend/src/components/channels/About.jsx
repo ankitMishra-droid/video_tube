@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import loader from "@/assets/loader.gif";
 import { Eye, GlobeIcon, InfoIcon, LucideSubscript, Mail, MessageCircle, SubscriptIcon, ThumbsUp, Video } from "lucide-react";
 import formatDate from "@/helpers/formatDate";
+import axiosFetch from "@/helpers/fetchData";
 
 const About = () => {
   const { userName } = useParams();
@@ -20,20 +21,12 @@ const About = () => {
 
   const getAboutDetails = async () => {
     try {
-      const response = await fetch(
-        `${fetchApi.getAboutChannel.url}/${user?._id}`,
-        {
-          method: fetchApi.getAboutChannel.method,
-          credentials: "include",
-        }
-      );
+      const response = await axiosFetch.get(`/dashboard/${user?._id}`);
 
-      const dataRes = await response.json();
-
-      if (dataRes.success) {
-        setAboutChannel(dataRes?.data);
+      if (response.data.success) {
+        setAboutChannel(response?.data?.data);
       }else{
-        toast.error(dataRes?.message)
+        toast.error(response?.data?.message)
       }
     } catch (error) {
       toast.error("somthing went wrong");

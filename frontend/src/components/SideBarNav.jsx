@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import { removeUserDetails } from "@/features/authSlice";
+import axiosFetch from "@/helpers/fetchData";
 
 const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
   const [show, setShow] = useState(false);
@@ -36,13 +37,9 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(fetchApi.logoutUser.url, {
-        method: fetchApi.logoutUser.method,
-        credentials: "include",
-      });
+      const response = await axiosFetch.get("/users/logout");
 
-      const dataRes = await response.json();
-      if (dataRes.success) {
+      if (response.data.success) {
         localStorage.removeItem("accessToken");
         sessionStorage.removeItem("accessToken");
         toast.success("Logged out!");

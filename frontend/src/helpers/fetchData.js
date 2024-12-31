@@ -1,74 +1,83 @@
-// axiosConfig.js
-import axios from "axios";
 import { toast } from "react-toastify";
+import axios from "axios";
 
-// Create axios instance for API calls
 const backendDomain =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL_PROD
     : import.meta.env.VITE_BACKEND_URL_DEV;
 
 const axiosFetch = axios.create({
-  baseURL: backendDomain,
-  withCredentials: true, // Important for handling cookies
-  timeout: 5000,
+  baseURL: `${backendDomain}/api`,
+  withCredentials: true,
 });
 
-// Function to parse error messages
-const parseErrorMessage = (error) => {
-  if (error.response?.data) {
-    return error.response.data.message || error.response.data.meessage || "Something went wrong";
-  }
-  return error.message || "Something went wrong";
-};
+function parseErrorMessage(responseHTMLString) {
+  const parser = new DOMParser();
+  const responseDocument = parser.parseFromString(
+    responseHTMLString,
+    "text/html"
+  );
+  const errorMessageElement = responseDocument.querySelector("pre");
 
-// Request interceptor
+  if (errorMessageElement) {
+    const errorMessage = errorMessageElement.textContent.match(
+      /^Error:\s*(.*?)(?=\s*at)/
+    );
+    if (errorMessage && errorMessage[1]) {
+      return errorMessage[1].trim();
+    }
+  }
+
+  return "Something went wrong 😕";
+}
+
 axiosFetch.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-    console.log("setting token: ", token);
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
-
-    console.log("config: ", config);
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Response interceptor
 axiosFetch.interceptors.response.use(
-  response => response, // Directly return successful responses.
-  async error => {
+  (response) => {
+    return response; 
+  },
+  async (error) => {
+    const errorMsg = parseErrorMessage(error.response.data);
     const originalRequest = error.config;
-
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Prevent infinite retry loops.
+    console.log(error.response.status);
+    if (
+      error.response.status === 401 &&
+      errorMsg === "TokenExpiredError" &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
       try {
-        const refreshToken = localStorage.getItem("refreshToken"); // Retrieve the stored refresh token.
-
-        const response = await axios.post("/api/users/refresh-access-token", {
-          refreshToken,
-        });
-
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
-
-        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-
-        return axios(originalRequest); // Retry the original request with the new access token.
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
+        const { data } = await axios.post(
+          "/api/users/refresh-access-token",
+          {},
+          { withCredentials: true }
+        );
+        console.log(data.data.accessToken)
+        localStorage.setItem("accessToken", data.data.accessToken);
+        axiosFetch.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${data.accessToken}`;
+        return axiosFetch(originalRequest);
+      } catch (err) {
+        console.error("Failed to refresh token", err);
         localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+        window.location.reload();
+        toast.error("Session expired. Please login again!");
       }
     }
-
-    return Promise.reject(error); // For all other errors, return the error as is.
+    return Promise.reject(error);
   }
 );
 
