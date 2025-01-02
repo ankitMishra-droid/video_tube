@@ -1,13 +1,14 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { isProduction } from "./constant.js";
 
 const app = express();
 
-const frontendUrl = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
 app.use(cors({
-    origin: frontendUrl,
+    origin: [
+        "https://video-tube-domi.vercel.app",
+        "http://localhost:5173"
+    ],
     credentials: true
 }))
 
