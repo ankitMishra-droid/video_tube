@@ -37,14 +37,15 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
 
   const handleLogout = async () => {
     try {
-      await axiosFetch.get("/users/logout")
-      .then(() => {
+      const response = await axiosFetch.get("/users/logout");
+
+      if (response.data.success) {
         localStorage.removeItem("accessToken");
         sessionStorage.removeItem("accessToken");
         toast.success("Logged out!");
         dispatch(removeUserDetails(null));
         navigate("/");
-      })
+      }
     } catch (error) {
       toast.error(error.message);
       console.log(error);

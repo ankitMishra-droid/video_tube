@@ -45,12 +45,10 @@ const Login = () => {
         dispatch(setUserDetails(response.data.data.user));
         localStorage.setItem("accessToken", response.data.data.accessToken);
         toast.success(response?.data?.message + "🤩");
-        navigate("/"); // Redirect to the home or dashboard page
-      } else {
-        toast.error(response?.data?.meessage || "Something went wrong.");
+        navigate("/");
       }
     } catch (error) {
-      setError((prev) => ({ ...prev, general: "Something went wrong" }));
+      setError((prev) => ({ ...prev, general: error?.response?.data?.meessage || "something went wrong" }));
     } finally {
       setLoading(false);
     }

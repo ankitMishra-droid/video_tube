@@ -63,19 +63,19 @@ const Header = ({ setIsSidebarIsOpen }) => {
         ) : (
           <div className="flex gap-3 items-center">
             <Link
-              to={`/channel/${user.userName}`}
+              to={`/channel/${user?.userName}`}
               className={`flex flex-col sm:flex-row items-center sm:gap-2 ${textColor}`}
             >
               {user?.avatar ? (
                 <img
-                  src={user.avatar}
-                  alt={user.firstName}
+                  src={user?.avatar}
+                  alt={user?.firstName}
                   className="object-cover w-7 h-7 sm:w-10 sm:h-10 rounded-full object-fit border border-black"
                 />
               ) : (
                 <User2 className="text-white w-7 h-7 sm:w-10 sm:h-10 object-fit" />
               )}
-              <p className={`hidden sm:block ${textColor}`}>{user.firstName}</p>
+              <p className={`hidden sm:block ${textColor}`}>{user?.firstName}</p>
             </Link>
           </div>
         )}
