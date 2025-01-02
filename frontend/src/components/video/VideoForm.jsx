@@ -11,6 +11,7 @@ import UploadVideoModal from "@/components/video/UploadVideo";
 import { useDispatch, useSelector } from "react-redux";
 import { addVideoStats } from "@/features/dashboardSlice";
 import { getChannelVideos } from "@/fetchDetails/getDashBoard";
+import axiosFetch from "@/helpers/fetchData";
 
 const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -83,20 +84,11 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
     setModalOpen(true);
 
     try {
-      const response = await fetch(`${fetchApi.getAllVideos.url}`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
+      const response = await axiosFetch.post(`/video`, formData);
 
-      if (!response.ok) {
-        throw new Error("Error uploading media.");
-      }
-
-      const result = await response.json();
-      if (result.data) {
+      if (response?.data?.data) {
         toast.success("Video uploaded");
-        dispatch(addVideoStats(result.data));
+        dispatch(addVideoStats(response.data.data));
         closeModal();
         getChannelVideos(dispatch);
       }
