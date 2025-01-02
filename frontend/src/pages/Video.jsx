@@ -25,7 +25,6 @@ const Video = () => {
     try {
       const response = await axiosFetch.get(`/video/${videoId}`);
 
-      console.log(response?.data)
       if (response?.data?.data) {
         dispatch(setVideo(response.data.data));
       }
