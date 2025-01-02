@@ -5,13 +5,14 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { PlusIcon } from "lucide-react";
+import fetchApi from "@/common";
 import { toast } from "react-toastify";
 import UploadVideoModal from "@/components/video/UploadVideo";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addVideoStats } from "@/features/dashboardSlice";
-import axios from "axios"; // Axios for sending API requests
+import { getChannelVideos } from "@/fetchDetails/getDashBoard";
 
-const VideoForm = forwardRef(({ closeModal }, ref) => {
+const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
   const [isUploading, setIsUploading] = useState(false);
   const [videoPreview, setVideoPreview] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
@@ -40,6 +41,7 @@ const VideoForm = forwardRef(({ closeModal }, ref) => {
       ...prevData,
       videoFile: videoFile,
     }));
+
     const videoUrl = URL.createObjectURL(videoFile);
     setVideoPreview(videoUrl);
   };
@@ -57,6 +59,7 @@ const VideoForm = forwardRef(({ closeModal }, ref) => {
       ...prevData,
       thumbnail: thumbnail,
     }));
+
     const thumbnailUrl = URL.createObjectURL(thumbnail);
     setThumbnailPreview(thumbnailUrl);
   };
@@ -71,8 +74,8 @@ const VideoForm = forwardRef(({ closeModal }, ref) => {
     formData.append("thumbnail", data.thumbnail);
     formData.append("isPublished", data.isPublished);
 
-    if (!data.videoFile || !data.thumbnail) {
-      console.error("Video or thumbnail file is missing!");
+    if (!data.videoFile) {
+      console.error("No video file found!");
       return;
     }
 
@@ -80,34 +83,25 @@ const VideoForm = forwardRef(({ closeModal }, ref) => {
     setModalOpen(true);
 
     try {
-      // 1. Upload video to Cloudinary
-      const videoFormData = new FormData();
-      videoFormData.append("file", data.videoFile);
-      videoFormData.append("upload_preset", "your_cloudinary_upload_preset");  // Cloudinary upload preset
-      const videoResponse = await axios.post("https://api.cloudinary.com/v1_1/your_cloud_name/video/upload", videoFormData);
+      const response = await fetch(`${fetchApi.getAllVideos.url}`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
 
-      // 2. Upload thumbnail to Cloudinary
-      const thumbnailFormData = new FormData();
-      thumbnailFormData.append("file", data.thumbnail);
-      thumbnailFormData.append("upload_preset", "your_cloudinary_upload_preset");  // Cloudinary upload preset
-      const thumbnailResponse = await axios.post("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", thumbnailFormData);
+      if (!response.ok) {
+        throw new Error("Error uploading media.");
+      }
 
-      // 3. After uploading, save video and thumbnail data
-      const videoData = {
-        videoUrl: videoResponse.data.secure_url,
-        thumbnailUrl: thumbnailResponse.data.secure_url,
-        title: data.title,
-        description: data.description,
-        isPublished: data.isPublished,
-      };
-
-      // Dispatch success action
-      toast.success("Video uploaded successfully!");
-      dispatch(addVideoStats(videoData));
-      closeModal();
+      const result = await response.json();
+      if (result.data) {
+        toast.success("Video uploaded");
+        dispatch(addVideoStats(result.data));
+        closeModal();
+        getChannelVideos(dispatch);
+      }
     } catch (error) {
-      console.error("Error uploading to Cloudinary:", error);
-      toast.error("Error uploading video.");
+      console.error("Error uploading files:", error);
     } finally {
       setIsUploading(false);
       setModalOpen(false);
@@ -182,6 +176,7 @@ const VideoForm = forwardRef(({ closeModal }, ref) => {
             onCheckedChange={togglePublish}
           />
         </div>
+        {/* <span className="text-xs">Note.*By default the video is published</span> */}
         <div>
           <Button
             type="submit"

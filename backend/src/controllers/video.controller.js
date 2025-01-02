@@ -9,6 +9,12 @@ import { Comments } from "../models/comment.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import User from "../models/users.model.js";
 import { Subscription } from "../models/subscription.model.js";
+import fs from "fs";
+
+function unlinkPath(videoFilePath, thumbnailFilePath){
+  if(videoFilePath) fs.unlinkSync(videoFilePath);
+  if(thumbnailFilePath) fs.unlinkSync(thumbnailFilePath);
+}
 
 const publishVideo = asyncHandler(async (req, res) => {
   try {
@@ -36,6 +42,7 @@ const publishVideo = asyncHandler(async (req, res) => {
     );
 
     if (!videoFile || !thumbnailFile) {
+      unlinkPath(videoFilePath, thumbnailFilePath)
       throw new ApiError(500, "File upload failed");
     }
 
@@ -44,7 +51,7 @@ const publishVideo = asyncHandler(async (req, res) => {
       description,
       videoFile: videoFile.secure_url,
       thumbnail: thumbnailFile.secure_url,
-      duration: videoFile.duration, // Ensure this is returned from Cloudinary
+      duration: videoFile.duration,
       isPublished: req.body.isPublished || false,
       owner: req.user?._id,
     });
@@ -55,7 +62,6 @@ const publishVideo = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Video uploading failed.");
     }
 
-    // Respond with success
     return res
       .status(201)
       .json(new ApiResponse(201, "Video uploaded", uploadedVideo));
