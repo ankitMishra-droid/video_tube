@@ -86,15 +86,15 @@ const VideoForm = forwardRef(({ video = false, closeModal }, ref) => {
     try {
       const response = await axiosFetch.post(`/video`, formData);
       
-      if (response.data.data) {
+      if (response?.data?.data) {
         toast.success("Video uploaded");
         dispatch(addVideoStats(response.data.data));
         closeModal();
         getChannelVideos(dispatch);
       }
     } catch (error) {
-      toast.error(error.response.data.meessage)
       console.error("Error uploading files:", error);
+      toast.error(error.response.data.meessage)
     } finally {
       setIsUploading(false);
       setModalOpen(false);
