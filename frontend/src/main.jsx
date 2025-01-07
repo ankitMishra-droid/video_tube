@@ -12,7 +12,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import PageNotFound from "./components/PageNotFound";
 import MyChannel from "./components/channels/MyChannel";
 import ChannelVideos from "./components/channels/ChannelVideos";
-import Tweets from "./components/channels/Tweets";
+import Tweets from "./pages/Tweets";
 import VideoPlaylist from "./components/channels/VideoPlaylist";
 import About from "./components/channels/About";
 import ChannelSubscribed from "./components/channels/ChannelSubscribed";
@@ -104,6 +104,10 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <Settings />
+      },
+      {
+        path: "/tweets",
+        element: <Tweets />
       }
     ],
   },

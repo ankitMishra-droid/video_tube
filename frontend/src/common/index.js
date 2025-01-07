@@ -91,6 +91,10 @@ const fetchApi = {
     updatePassword: {
         url: `${backendDomain}/api/users/change-password`,
         method: "POST"
+    },
+    getTweets: {
+        url: `${backendDomain}/api/tweet`,
+        method: "GET"
     }
 }
 

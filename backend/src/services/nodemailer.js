@@ -21,7 +21,6 @@ const sendMail = async(email, subject, text, htmlContent) => {
             html: htmlContent
         })
 
-        // return res.status(200).json()
         console.log("email sent successfully")
     } catch (error) {
         console.log(error)
