@@ -51,11 +51,8 @@ const VideoPanel = ({ channelVideos }) => {
 
   return (
     <div>
-      {/* search video */}
       <div className=""></div>
-      {/* search video */}
 
-      {/* videos */}
       <div className="w-full overflow-auto border mt-5 rounded-md">
         <table className="w-full min-w-[1000px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

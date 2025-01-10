@@ -42,7 +42,7 @@ const Tweets = () => {
       const response = await axiosFetch.post("/tweet", data);
       if (response?.data?.data) {
         toast.success(response.data.message);
-        dispatch(setTweets(response?.data));
+        dispatch(setTweets(response?.data?.data));
       } else {
         toast.error(response?.data?.message || "something went wrong");
       }

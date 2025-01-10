@@ -293,12 +293,10 @@ const getVideoById = asyncHandler(async (req, res) => {
       throw new ApiError(404, "video dosen't availabe");
     }
 
-    // increase views
     await Video.findByIdAndUpdate(videoId, {
       $inc: { views: 1 },
     });
 
-    // store watchHistory
     await User.findByIdAndUpdate(req.user?._id, {
       $addToSet: {
         watchHistory: videoId,
