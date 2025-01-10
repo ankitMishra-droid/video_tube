@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 const TweetCard = ({ tweet }) => {
   const status = useSelector((state) => state?.auth?.status);
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user)
   const navigation = useNavigate();
 
   const toggleLike = async () => {
