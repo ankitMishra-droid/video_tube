@@ -23,7 +23,6 @@ const Tweets = () => {
       const response = await axiosFetch.get(`/tweet/${user?._id}`);
       if (response?.data?.statusCode === 201) {
         setLoading(false);
-        console.log(response.data.data);
         dispatch(setTweets(response.data.data));
       } else {
         dispatch(setTweets(response.data.data));
