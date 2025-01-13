@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Tweet } from "../models/tweet.model.js";
 import mongoose, { isValidObjectId, Types } from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
 
 const createTweet = asyncHandler(async (req, res) => {
   try {
@@ -32,19 +33,20 @@ const createTweet = asyncHandler(async (req, res) => {
   }
 });
 
-const getUserTweets = asyncHandler(async (req, res) => {
+const getAllUserTweets = asyncHandler(async (req, res) => {
+  const {page = 1, limit = 30} = req.query;
   try {
-    const { userId } = req.params;
-
-    if (!isValidObjectId(userId)) {
-      throw new Error("Invlaid id");
-    }
-
     const allTweet = await Tweet.aggregate([
       {
-        $match: {
-          owner: new mongoose.Types.ObjectId(userId),
-        },
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $skip: (page - 1) * limit
+      },
+      {
+        $limit: parseInt(limit)
       },
       {
         $lookup: {
@@ -107,6 +109,10 @@ const getUserTweets = asyncHandler(async (req, res) => {
         },
       },
     ]);
+
+    if(!allTweet){
+      throw new ApiError(401, "error while fetching all tweets")
+    }
 
     return res
       .status(200)
@@ -196,4 +202,116 @@ const deleteTweet = asyncHandler(async (req, res) => {
   }
 });
 
-export { createTweet, getUserTweets, updateTweet, deleteTweet };
+const getUserTweet = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const { page = 1, limit = 30 } = req.query;
+
+  if (!userId || !isValidObjectId(userId)) {
+    throw new ApiError(401, "user id not found");
+  }
+
+  try {
+    const userTweet = await Tweet.aggregate([
+      {
+        $match: {
+          owner: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $skip: (page - 1) * limit,
+      },
+      {
+        $limit: parseInt(limit),
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "owner",
+          foreignField: "_id",
+          as: "owner",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                avatar: 1,
+                userName: 1,
+                firstName: 1,
+                lastName: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          owner: {
+            $first: "$owner",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "tweet",
+          as: "likeDetails",
+        },
+      },
+      {
+        $addFields: {
+          likesCount: {
+            $size: "$likeDetails",
+          },
+          isLiked: {
+            $cond: {
+              if: {
+                $in: [req.user?._id, "$likeDetails.likedBy"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          content: 1,
+          owner: 1,
+          likesCount: 1,
+          isLiked: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    ]);
+
+    if (!userTweet) {
+      throw new ApiError(401, "Error while fetching user tweet");
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(201, "user tweets fetched", userTweet));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: error?.message || "something went wrong",
+      error: true,
+      success: false,
+    });
+  }
+});
+
+export {
+  createTweet,
+  getAllUserTweets,
+  updateTweet,
+  deleteTweet,
+  getUserTweet,
+};

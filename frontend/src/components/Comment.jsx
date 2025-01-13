@@ -13,6 +13,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Input } from "./ui/input";
 import { useSelector } from "react-redux";
 import { Button } from "./ui/button";
+import axiosFetch from "@/helpers/fetchData";
 
 const Comment = ({ video }) => {
   const [comments, setComments] = useState([]);
@@ -70,6 +71,27 @@ const Comment = ({ video }) => {
       setHasMore(false);
     }
   };
+
+  const handleLike = async(commentId) => {
+    try {
+      const res = await axiosFetch.post(`/like/toggle/c/${commentId}`);
+
+      if(res.data.data){
+        console.log(res.data)
+        setComments((prev) => (
+          prev.map((comment) => comment?._id === commentId ? {
+            ...comment,
+            isLiked: !comment?.isLiked,
+            likesCount: comment?.isLiked
+            ? comment?.likesCount - 1 :
+            comment?.likesCount + 1
+          }: comment)
+        ))
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   useEffect(() => {
     if (page === 1) {
@@ -218,7 +240,7 @@ const Comment = ({ video }) => {
                 </div>
                 <div className="px-10 -mt-2">
                   <p>{comment?.content}</p>
-                  <button className="py-2 mb-3 flex items-center gap-2">
+                  <button className="py-2 mb-3 flex items-center gap-2" onClick={() => handleLike(comment?._id)}>
                     <ThumbsUp fill={comment?.isLiked ? "#121" : "none"} />
                     <span>
                       {comment?.likesCount > 0 ? comment?.likesCount : "Like"}

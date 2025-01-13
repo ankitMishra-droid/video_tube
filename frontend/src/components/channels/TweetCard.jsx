@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Edit, MoreVertical, ThumbsUp, Trash } from "lucide-react";
 import {
   deleteTweets,
-  setTweets,
   toggleLikeTweet,
 } from "@/features/userTweets";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getUserTweet } from "@/fetchDetails/getUserTweet";
 
 const TweetCard = ({ tweet }) => {
   const status = useSelector((state) => state?.auth?.status);
@@ -51,6 +51,8 @@ const TweetCard = ({ tweet }) => {
                 : tweet?.likesCount + 1,
             })
           );
+        }else{
+          getUserTweet(dispatch, user?._id)
         }
       } else {
         navigation("/login");
@@ -154,7 +156,7 @@ const TweetCard = ({ tweet }) => {
                             variant="outline"
                             className="flex items-center gap-2 p-2 -mb-3 cursor-pointer hover:bg-gray-100 text-green-600 w-full border-none"
                           >
-                            <Edit fontSize={16}/> <span>Edit</span>
+                            <Edit fontSize={16} /> <span>Edit</span>
                           </div>
                         </DialogTrigger>
                         <DialogContent

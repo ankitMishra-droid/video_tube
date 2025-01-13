@@ -20,8 +20,8 @@ const Tweets = () => {
   const getAllTweets = async () => {
     setLoading(true);
     try {
-      const response = await axiosFetch.get(`/tweet/${user?._id}`);
-      if (response?.data?.statusCode === 201) {
+      const response = await axiosFetch.get(`/tweet/get-all-tweets`);
+      if (response?.data?.statusCode === 201) { 
         setLoading(false);
         dispatch(setTweets(response.data.data));
       } else {
