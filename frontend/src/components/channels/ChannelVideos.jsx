@@ -46,9 +46,9 @@ const ChannelVideos = () => {
     if (sortType !== type) {
       setSortType(type);
       setPage(1);
-      setHasMore(true); // Reset pagination.
+      setHasMore(true);
       setLoading(true);
-      initialFetchRef.current = false; // Allow fresh fetch.
+      initialFetchRef.current = false;
     }
   };
 

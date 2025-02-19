@@ -62,7 +62,7 @@ function App() {
       />
       <Header setIsSidebarIsOpen={setIsSidebarOpen} />
       <main
-        className={`flex-1 transition-all duration-300 ease-in-out mt-5 ${
+        className={`flex-1 transition-all duration-300 ease-in-out mt-28 ${
           isSidebarOpen
             ? `ml-0 ${location.pathname === "/" && "md:ml-64"} px-3 py-2`
             : "ml-0 px-2 sm:px-6 2xl:container sm:mx-auto 2xl:px-2"

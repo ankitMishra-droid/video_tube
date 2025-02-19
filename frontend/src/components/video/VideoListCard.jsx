@@ -20,7 +20,7 @@ const VideoListCard = ({ video, description, imgSize }) => {
       >
         <div
           key={video?._id}
-          className="w-full flex flex-col sm:flex-row rounded-xl my-3 text-black p-1 transition-all hover:bg-slate-300 align-middle"
+          className="w-full flex flex-col sm:flex-row rounded-xl my-3 text-black p-1 transition-all hover:bg-slate-300 align-middle items-center"
         >
           {/* <div className="grid grid-cols-2 lg:grid-rows-1"> */}
           <div className="relative flex-shrink-0 rounded-xl h-full">

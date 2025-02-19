@@ -1,7 +1,7 @@
 import TweetCard from "@/components/channels/TweetCard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { setTweets } from "@/features/userTweets";
+import { removeTweets, setTweets } from "@/features/userTweets";
 import axiosFetch from "@/helpers/fetchData";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

@@ -33,7 +33,7 @@ const Header = ({ setIsSidebarIsOpen }) => {
 
   return (
     <nav
-      className={`w-full py-6 sticky top-0 left-0 right-0 z-50 transition-all shadow-md ${bgColor}`}
+      className={`w-full py-6 fixed top-0 left-0 right-0 z-50 transition-all shadow-md ${bgColor}`}
     >
       <div className="container mx-auto flex items-center justify-between px-4">
         {/* Sidebar and Logo */}

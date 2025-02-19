@@ -76,8 +76,7 @@ const Comment = ({ video }) => {
     try {
       const res = await axiosFetch.post(`/like/toggle/c/${commentId}`);
 
-      if(res.data.data){
-        console.log(res.data)
+      if(res.data.success){
         setComments((prev) => (
           prev.map((comment) => comment?._id === commentId ? {
             ...comment,
@@ -145,6 +144,8 @@ const Comment = ({ video }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  console.log(comments)
   return (
     <div>
       <div className="mt-4">
