@@ -351,15 +351,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       sameSite: isProduction ? "None" : "Lax",
     };
 
-    const { accessToken } = await generateAccessTokenAndRefreshToken(
-      user._id,
-      1
-    );
+    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
-      .json(new ApiResponse(200, "Access token refreshed", { accessToken }));
+      .cookie("refreshToken", refreshToken, options)
+      .json(new ApiResponse(200, "Access token refreshed", { accessToken, refreshToken }));
   } catch (error) {
     return res.status(500).json({
       meessage: error?.message || "something went wrong",
