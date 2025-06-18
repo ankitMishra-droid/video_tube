@@ -13,6 +13,7 @@ const fetchRefreshToken = async(navigate, toast) => {
         const resData = await response.json()
         if(resData?.data){
             localStorage.setItem("accessToken", resData?.data?.accessToken)
+            localStorage.setItem("refreshToken", resData?.data?.refreshToken)
             return resData.data.expiresIn
         }else{
             toast.error("Session expired, please login")
