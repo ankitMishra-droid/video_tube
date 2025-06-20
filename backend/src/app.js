@@ -4,13 +4,21 @@ import cors from "cors";
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL_DEV,
+  process.env.FRONTEND_URL_PROD
+];
+
 app.use(cors({
-    origin: [
-        "https://video-tube-domi.vercel.app",
-        "http://localhost:5173"
-    ],
-    credentials: true
-}))
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 
 app.use(express.json({ limit: "200mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200mb" }));
