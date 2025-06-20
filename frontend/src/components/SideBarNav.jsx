@@ -41,7 +41,9 @@ const SideBarNav = ({ setIsSidebarIsOpen, textColor }) => {
 
       if (response.data.success) {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
         toast.success("Logged out!");
         dispatch(removeUserDetails(null));
         navigate("/");

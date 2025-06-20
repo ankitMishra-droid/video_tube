@@ -5,8 +5,7 @@ import Loader from "../assets/loader.gif";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "@/features/authSlice";
 import { Eye, EyeClosed } from "lucide-react";
-import axiosFetch from "@/helpers/fetchData"; // Axios instance with interceptors
-import fetchApi from "@/common"; // Your fetchApi or axios logic
+import axiosFetch from "@/helpers/fetchData";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -17,9 +16,7 @@ const Login = () => {
     password: "",
   });
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePassword = () => setShowPassword(!showPassword);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,13 +39,28 @@ const Login = () => {
       const response = await axiosFetch.post("/users/login", data);
 
       if (response?.data?.data) {
-        dispatch(setUserDetails(response.data.data.user));
-        localStorage.setItem("accessToken", response.data.data.accessToken);
-        toast.success(response?.data?.message + "🤩");
+        const { user, accessToken, refreshToken } = response.data.data;
+
+        // Save tokens
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        dispatch(setUserDetails(user));
+        toast.success(response?.data?.message + " 🤩");
+
+        // Optional: reset form
+        setData({ email: "", password: "" });
+
         navigate("/");
       }
     } catch (error) {
-      setError((prev) => ({ ...prev, general: error?.response?.data?.meessage || "something went wrong" }));
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.meessage || // handle misspelled backend response
+        error?.message ||
+        "Something went wrong";
+
+      setError((prev) => ({ ...prev, general: message }));
     } finally {
       setLoading(false);
     }
@@ -82,6 +94,7 @@ const Login = () => {
               <p className="text-red-500 text-xs italic">{error.email}</p>
             )}
           </div>
+
           <div className="mb-6 relative">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -109,6 +122,7 @@ const Login = () => {
               <p className="text-red-500 text-xs italic">{error.password}</p>
             )}
           </div>
+
           <div className="flex flex-col items-center justify-center">
             <button
               className="bg-blue-600 hover:bg-blue-700 w-1/2 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -123,6 +137,7 @@ const Login = () => {
                 "Sign In"
               )}
             </button>
+
             {error.general && (
               <p className="text-red-500 text-xs italic mt-2">
                 {error.general}
@@ -130,7 +145,7 @@ const Login = () => {
             )}
 
             <p className="text-center text-blue-500 text-xs py-1 pt-2">
-              Don't Have an Account?{" "}
+              Don't have an account?{" "}
               <Link to="/signup" className="text-red-500 hover:underline pl-1">
                 Sign Up
               </Link>
@@ -144,8 +159,9 @@ const Login = () => {
             </Link>
           </div>
         </form>
+
         <p className="text-center text-gray-500 text-xs">
-          &copy;2024 PlayPulse ltd. All rights reserved.
+          &copy;2024 PlayPulse Ltd. All rights reserved.
         </p>
       </div>
     </div>

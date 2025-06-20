@@ -1,5 +1,7 @@
-import { toast } from "react-toastify";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { logoutUser, setAccessToken, removeUserDetails } from "@/features/authSlice";
+import { store } from "@/store/store";
 
 const backendDomain =
   import.meta.env.MODE === "production"
@@ -11,26 +13,20 @@ const axiosFetch = axios.create({
   withCredentials: true,
 });
 
+// Helper: Parse error from HTML response
 function parseErrorMessage(responseHTMLString) {
-  const parser = new DOMParser();
-  const responseDocument = parser.parseFromString(
-    responseHTMLString,
-    "text/html"
-  );
-  const errorMessageElement = responseDocument.querySelector("pre");
-
-  if (errorMessageElement) {
-    const errorMessage = errorMessageElement.textContent.match(
-      /^Error:\s*(.*?)(?=\s*at)/
-    );
-    if (errorMessage && errorMessage[1]) {
-      return errorMessage[1].trim();
-    }
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(responseHTMLString, "text/html");
+    const pre = doc.querySelector("pre");
+    const match = pre?.textContent?.match(/^Error:\s*(.*?)(?=\s*at)/);
+    return match?.[1]?.trim() || "Something went wrong 😕";
+  } catch {
+    return "Something went wrong 😕";
   }
-
-  return "Something went wrong 😕";
 }
 
+// Request Interceptor
 axiosFetch.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -39,44 +35,89 @@ axiosFetch.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Response Interceptor
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 axiosFetch.interceptors.response.use(
-  (response) => {
-    return response; 
-  },
+  (response) => response,
   async (error) => {
-    const errorMsg = parseErrorMessage(error.response.data);
     const originalRequest = error.config;
-    console.log(error.response.status);
+    const status = error?.response?.status;
+    const errMsg = parseErrorMessage(error?.response?.data);
+
     if (
-      error.response.status === 401 &&
-      errorMsg === "TokenExpiredError" &&
+      status === 401 &&
+      errMsg === "TokenExpiredError" &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            return axiosFetch(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      isRefreshing = true;
+
       try {
+        const refreshToken = localStorage.getItem("refreshToken");
+
         const { data } = await axios.post(
-          "/api/users/refresh-access-token",
-          {},
+          `${backendDomain}/api/users/refresh-access-token`,
+          { refreshToken },
           { withCredentials: true }
         );
-        console.log(data.data.accessToken)
-        localStorage.setItem("accessToken", data.data.accessToken);
-        axiosFetch.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${data.accessToken}`;
+
+        const { accessToken, refreshToken: newRefreshToken } = data?.data || {};
+
+        // Save tokens
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+
+        axiosFetch.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+        store.dispatch(setAccessToken(accessToken)); // ✅ Use store directly
+
+        processQueue(null, accessToken);
+
+        originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return axiosFetch(originalRequest);
-      } catch (err) {
-        console.error("Failed to refresh token", err);
-        localStorage.removeItem("accessToken");
-        window.location.reload();
-        toast.error("Session expired. Please login again!");
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        toast.error("Session expired. Please log in again.");
+
+        store.dispatch(logoutUser()); // ✅ Use store directly
+        store.dispatch(removeUserDetails())
+        localStorage.clear();
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
+
+    // toast.error(errMsg || "An error occurred");
     return Promise.reject(error);
   }
 );
