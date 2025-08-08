@@ -145,7 +145,6 @@ const Comment = ({ video }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log(comments)
   return (
     <div>
       <div className="mt-4">

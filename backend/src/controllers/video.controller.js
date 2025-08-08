@@ -2,7 +2,6 @@ import { asyncHandler } from "../utils/asyncHandlers.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Video } from "../models/video.model.js";
-import crypto from "crypto";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/likes.model.js";
 import { Comments } from "../models/comment.model.js";
@@ -10,10 +9,11 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import User from "../models/users.model.js";
 import { Subscription } from "../models/subscription.model.js";
 import fs from "fs";
+import { View } from "../models/viewController.model.js";
 
-function unlinkPath(videoFilePath, thumbnailFilePath){
-  if(videoFilePath) fs.unlinkSync(videoFilePath);
-  if(thumbnailFilePath) fs.unlinkSync(thumbnailFilePath);
+function unlinkPath(videoFilePath, thumbnailFilePath) {
+  if (videoFilePath) fs.unlinkSync(videoFilePath);
+  if (thumbnailFilePath) fs.unlinkSync(thumbnailFilePath);
 }
 
 const publishVideo = asyncHandler(async (req, res) => {
@@ -312,6 +312,81 @@ const getVideoById = asyncHandler(async (req, res) => {
   }
 });
 
+const getVideoViews = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const { userId, duration, durationWatched } = req.body
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid video or user id")
+  }
+
+  try {
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+      throw new ApiError(404, "video not found")
+    }
+
+    const MIN_DUR = 30;
+    const REWATCH_DUR = 0.6;
+
+    const exisitngView = await View.findOne({
+      video: videoId,
+      user: userId
+    });
+
+    if (!exisitngView) {
+      if (durationWatched >= MIN_DUR) {
+        await Video.findByIdAndUpdate(videoId, {
+          $inc: { views: 1 }
+        })
+
+        await View.create({
+          video: videoId,
+          user: userId,
+          lastWatch: new Date(),
+          watchedDuration: durationWatched
+        });
+
+        return res.status(200).json(
+          new ApiResponse(200, "View Counted")
+        )
+      }
+      return res.status(200).json(new ApiResponse(200, "Atleast 30 sec to watch to count views"))
+    }
+
+    let watchedPercentage = (durationWatched / duration) * 100;
+
+    if (watchedPercentage >= REWATCH_DUR * 100) {
+      const timeSinceLastView = Date.now() - new Date(exisitngView.lastWatchedAt).getTime();
+      const hoursInMs = 3600000;
+
+      if (timeSinceLastView > hoursInMs) {
+        await Video.findByIdAndUpdate(videoId, {
+          $inc: { views: 1 }
+        })
+
+
+        exisitngView.lastWatchedAt = new Date();
+        exisitngView.watchedDuration = durationWatched;
+        await exisitngView.save()
+
+        return res.status(200).json(new ApiResponse(200, "view count updated"))
+      } else {
+        return res.status(200).json(new ApiResponse(200, "wait for again view count"))
+      }
+    }
+
+    return res.status(200).json(new ApiResponse(200, "atleast 30 sec to wait for views count"))
+  } catch (error) {
+    return res.status(500).json({
+      message: error?.message || error,
+      error: true,
+      success: false
+    })
+  }
+})
+
 const deleteVideos = asyncHandler(async (req, res) => {
   try {
     const { videoId } = req.params;
@@ -385,10 +460,6 @@ const updateVideo = asyncHandler(async (req, res) => {
         $set: {
           title: title,
           description: description,
-          // thumbnail: {
-          //   public_id: crypto.randomBytes(32).toString("hex"),
-          //   url: thumbnailPath,
-          // },
         },
       },
       { new: true }
@@ -607,7 +678,7 @@ const getUserSubscribedVideos = asyncHandler(async (req, res) => {
     }
   ]);
 
-  if(!video){
+  if (!video) {
     throw new ApiError(401, "subscribed video fetching failed");
   }
 
@@ -620,6 +691,7 @@ export {
   publishVideo,
   getAllVideos,
   getVideoById,
+  getVideoViews,
   deleteVideos,
   updateVideo,
   togglePublish,

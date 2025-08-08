@@ -7,6 +7,7 @@ import {
   getUserSubscribedVideos,
   getUserVideo,
   getVideoById,
+  getVideoViews,
   publishVideo,
   togglePublish,
   updateVideo,
@@ -39,8 +40,9 @@ videoRoutes
   .get(checkUser, getVideoById)
   .delete(verifyJWT, deleteVideos)
   .patch(verifyJWT, updateVideo)
-  .put(verifyJWT, togglePublish);
+  .put(verifyJWT, togglePublish)
 
+videoRoutes.route("/:videoId/views").get(verifyJWT, getVideoViews)
 videoRoutes.route("/s/subscription").get(checkUser, getUserSubscribedVideos)
 
 export { videoRoutes };

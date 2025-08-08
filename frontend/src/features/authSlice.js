@@ -14,11 +14,9 @@ const authSlice = createSlice({
     reducers: {
         setAccessToken: (state, action) => {
             state.accessToken = action.payload;
-            console.log(action.payload)
         },
         setRefreshToken: (state, action) => {
             state.refreshToken = action.payload
-            console.log(action.payload)
         },
         logoutUser: (state) => {
             state.user = null;
@@ -27,7 +25,6 @@ const authSlice = createSlice({
         setUserDetails: (state, action) => {
             state.status = true;
             state.user = action.payload;
-            // console.log(action.payload)
         },
         removeUserDetails: (state) => {
             state.status = false;

@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": "https://video-tube-indol.vercel.app/api",
       },
+      host: "0.0.0.0"
     },
     plugins: [react()],
     resolve: {
